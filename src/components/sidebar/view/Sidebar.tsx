@@ -192,6 +192,7 @@ function Sidebar({
     onSaveEditingSession: (projectName: string, sessionId: string, summary: string, provider: LLMProvider) => {
       void updateSessionSummary(projectName, sessionId, summary, provider);
     },
+    onCreateProject: () => setShowNewProject(true),
     t,
   };
 
@@ -295,7 +296,6 @@ function Sidebar({
               void refreshProjects();
             }}
             isRefreshing={isRefreshing}
-            onCreateProject={() => setShowNewProject(true)}
             onCollapseSidebar={handleCollapseSidebar}
             updateAvailable={updateAvailable}
             restartRequired={restartRequired}

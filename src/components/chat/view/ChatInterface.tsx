@@ -76,6 +76,8 @@ function ChatInterface({
     opencodeModel,
     setOpenCodeModel,
     permissionMode,
+    permissionModes,
+    selectPermissionMode,
     pendingPermissionRequests,
     setPendingPermissionRequests,
     cyclePermissionMode,
@@ -368,7 +370,8 @@ function ChatInterface({
           isLoading={isProcessing}
           onAbortSession={handleAbortSession}
           permissionMode={permissionMode}
-          onModeSwitch={cyclePermissionMode}
+          permissionModes={permissionModes}
+          onPermissionModeChange={selectPermissionMode}
           tokenBudget={tokenBudget}
           onShowTokenUsage={showCostModal}
           slashCommandsCount={slashCommandsCount}
@@ -425,7 +428,6 @@ function ChatInterface({
                     : t('messageTypes.claude'),
           })}
           isTextareaExpanded={isTextareaExpanded}
-          sendByCtrlEnter={sendByCtrlEnter}
         />
       </div>
 

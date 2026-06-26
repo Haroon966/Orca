@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { authenticatedFetch } from '../../../utils/api';
 import type { PendingPermissionRequest, PermissionMode } from '../types/types';
 import type {
@@ -383,7 +383,7 @@ export function useChatProviderState({ selectedSession, selectedProject }: UseCh
   const cyclePermissionMode = useCallback(() => {
     const modes = getPermissionModesForProvider(provider);
 
-    const currentIndex = modes.indexOf(permissionMode);
+    const currentIndex = modes.indexOf(permissionMode as PermissionMode);
     const nextIndex = (currentIndex + 1) % modes.length;
     const nextMode = modes[nextIndex];
     setPermissionMode(nextMode);
@@ -392,6 +392,23 @@ export function useChatProviderState({ selectedSession, selectedProject }: UseCh
       localStorage.setItem(`permissionMode-${selectedSession.id}`, nextMode);
     }
   }, [permissionMode, provider, selectedSession?.id, getPermissionModesForProvider]);
+
+  const permissionModes = useMemo(
+    () => getPermissionModesForProvider(provider),
+    [provider, getPermissionModesForProvider],
+  );
+
+  const selectPermissionMode = useCallback((mode: PermissionMode) => {
+    if (!permissionModes.includes(mode)) {
+      return;
+    }
+
+    setPermissionMode(mode);
+
+    if (selectedSession?.id) {
+      localStorage.setItem(`permissionMode-${selectedSession.id}`, mode);
+    }
+  }, [permissionModes, selectedSession?.id]);
 
   const selectProviderModel = useCallback(async (
     targetProvider: LLMProvider,
@@ -443,6 +460,8 @@ export function useChatProviderState({ selectedSession, selectedProject }: UseCh
     setOpenCodeModel,
     permissionMode,
     setPermissionMode,
+    permissionModes,
+    selectPermissionMode,
     pendingPermissionRequests,
     setPendingPermissionRequests,
     cyclePermissionMode,

@@ -45,8 +45,6 @@ const MessageCopyControl = ({
 }) => {
   const { t } = useTranslation('chat');
   const canSelectCopyFormat = messageType === 'assistant';
-  const defaultFormat: CopyFormat = canSelectCopyFormat ? 'markdown' : 'text';
-  const [selectedFormat, setSelectedFormat] = useState<CopyFormat>(defaultFormat);
   const [copied, setCopied] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
@@ -63,27 +61,14 @@ const MessageCopyControl = ({
         label: t('copyMessage.copyAsText', { defaultValue: 'Copy as text' }),
       },
     ],
-    [t]
+    [t],
   );
 
-  const selectedFormatTag = selectedFormat === 'markdown'
-    ? t('copyMessage.markdownShort', { defaultValue: 'MD' })
-    : t('copyMessage.textShort', { defaultValue: 'TXT' });
-
-  const copyPayload = useMemo(() => {
-    if (selectedFormat === 'markdown') {
-      return content;
-    }
-    return convertMarkdownToPlainText(content);
-  }, [content, selectedFormat]);
-
   useEffect(() => {
-    setSelectedFormat(defaultFormat);
     setIsDropdownOpen(false);
-  }, [defaultFormat]);
+  }, [content]);
 
   useEffect(() => {
-    // Close the dropdown when clicking anywhere outside this control.
     const closeOnOutsideClick = (event: MouseEvent) => {
       if (!isDropdownOpen) return;
       const target = event.target as Node;
@@ -106,12 +91,15 @@ const MessageCopyControl = ({
     };
   }, []);
 
-  const handleCopyClick = async () => {
-    if (!copyPayload.trim()) return;
-    const didCopy = await copyTextToClipboard(copyPayload);
+  const handleCopy = async (format: CopyFormat) => {
+    const payload = format === 'markdown' ? content : convertMarkdownToPlainText(content);
+    if (!payload.trim()) return;
+
+    const didCopy = await copyTextToClipboard(payload);
     if (!didCopy) return;
 
     setCopied(true);
+    setIsDropdownOpen(false);
     if (copyFeedbackTimerRef.current) {
       clearTimeout(copyFeedbackTimerRef.current);
     }
@@ -120,27 +108,34 @@ const MessageCopyControl = ({
     }, COPY_SUCCESS_TIMEOUT_MS);
   };
 
-  const handleFormatChange = (format: CopyFormat) => {
-    setSelectedFormat(format);
-    setIsDropdownOpen(false);
+  const handleCopyButtonClick = () => {
+    if (canSelectCopyFormat) {
+      setIsDropdownOpen((previous) => !previous);
+      return;
+    }
+
+    void handleCopy('text');
   };
 
   const toneClass = messageType === 'user'
     ? 'text-blue-100 hover:text-white'
     : 'text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300';
-  const copyTitle = copied ? t('copyMessage.copied') : t('copyMessage.copy');
-  const rootClassName = canSelectCopyFormat
-    ? 'relative flex min-w-0 flex-1 items-center gap-0.5 sm:min-w-max sm:flex-none sm:w-auto'
-    : 'relative flex items-center gap-0.5';
+  const copyTitle = copied
+    ? t('copyMessage.copied')
+    : canSelectCopyFormat
+      ? t('copyMessage.selectFormat', { defaultValue: 'Select copy format' })
+      : t('copyMessage.copy');
 
   return (
-    <div ref={dropdownRef} className={rootClassName}>
+    <div ref={dropdownRef} className="relative flex items-center">
       <button
         type="button"
-        onClick={handleCopyClick}
+        onClick={handleCopyButtonClick}
         title={copyTitle}
         aria-label={copyTitle}
-        className={`inline-flex items-center gap-1 rounded px-1 py-0.5 transition-colors ${toneClass}`}
+        aria-haspopup={canSelectCopyFormat ? 'menu' : undefined}
+        aria-expanded={canSelectCopyFormat ? isDropdownOpen : undefined}
+        className={`inline-flex items-center rounded p-1 transition-colors ${toneClass}`}
       >
         {copied ? (
           <svg className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
@@ -164,49 +159,27 @@ const MessageCopyControl = ({
             <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
           </svg>
         )}
-        <span className="text-[10px] font-semibold uppercase tracking-wide">{selectedFormatTag}</span>
       </button>
 
-      {canSelectCopyFormat && (
-        <>
-          <button
-            type="button"
-            onClick={() => setIsDropdownOpen((prev) => !prev)}
-            className={`rounded px-1 py-0.5 transition-colors ${toneClass}`}
-            aria-label={t('copyMessage.selectFormat', { defaultValue: 'Select copy format' })}
-            title={t('copyMessage.selectFormat', { defaultValue: 'Select copy format' })}
-          >
-            <svg
-              className={`h-3 w-3 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+      {canSelectCopyFormat && isDropdownOpen && (
+        <div
+          className="absolute left-0 top-full z-30 mt-1 min-w-36 rounded-md border border-gray-200 bg-white p-1 shadow-lg dark:border-gray-700 dark:bg-gray-900"
+          role="menu"
+        >
+          {copyFormatOptions.map((option) => (
+            <button
+              key={option.format}
+              type="button"
+              role="menuitem"
+              onClick={() => {
+                void handleCopy(option.format);
+              }}
+              className="block w-full rounded px-2 py-1.5 text-left text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800/60"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
-
-          {isDropdownOpen && (
-            <div className="absolute left-auto top-full z-30 mt-1 min-w-36 rounded-md border border-gray-200 bg-white p-1 shadow-lg dark:border-gray-700 dark:bg-gray-900">
-              {copyFormatOptions.map((option) => {
-                const isSelected = option.format === selectedFormat;
-                return (
-                  <button
-                    key={option.format}
-                    type="button"
-                    onClick={() => handleFormatChange(option.format)}
-                    className={`block w-full rounded px-2 py-1.5 text-left transition-colors ${isSelected
-                      ? 'bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-100'
-                      : 'text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800/60'
-                      }`}
-                  >
-                    <span className="block text-xs font-medium">{option.label}</span>
-                  </button>
-                );
-              })}
-            </div>
-          )}
-        </>
+              {option.label}
+            </button>
+          ))}
+        </div>
       )}
     </div>
   );

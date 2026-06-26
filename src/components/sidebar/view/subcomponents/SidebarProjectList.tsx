@@ -7,6 +7,7 @@ import type { LoadingProgress, Project, ProjectSession, LLMProvider } from '../.
 import type { SessionActivityMap } from '../../../../hooks/useSessionProtection';
 import type { MCPServerStatus, SessionWithProvider } from '../../types/types';
 
+import SidebarCreateProjectItem from './SidebarCreateProjectItem';
 import SidebarProjectItem from './SidebarProjectItem';
 import SidebarProjectsState from './SidebarProjectsState';
 
@@ -53,6 +54,7 @@ export type SidebarProjectListProps = {
   onStartEditingSession: (sessionId: string, initialName: string) => void;
   onCancelEditingSession: () => void;
   onSaveEditingSession: (projectName: string, sessionId: string, summary: string, provider: LLMProvider) => void;
+  onCreateProject: () => void;
   t: TFunction;
 };
 
@@ -94,6 +96,7 @@ export default function SidebarProjectList({
   onStartEditingSession,
   onCancelEditingSession,
   onSaveEditingSession,
+  onCreateProject,
   t,
 }: SidebarProjectListProps) {
   const state = (
@@ -119,9 +122,9 @@ export default function SidebarProjectList({
 
   return (
     <div className="pb-safe-area-inset-bottom md:space-y-1">
-      {!showProjects
-        ? state
-        : filteredProjects.map((project) => (
+      {!showProjects ? state : null}
+      {showProjects
+        ? filteredProjects.map((project) => (
             // React key + per-project state lookups all use the DB `projectId`
             // so they remain stable across renames and session changes.
             <SidebarProjectItem
@@ -161,7 +164,9 @@ export default function SidebarProjectList({
               onSaveEditingSession={onSaveEditingSession}
               t={t}
             />
-          ))}
+          ))
+        : null}
+      {!isLoading && <SidebarCreateProjectItem onCreateProject={onCreateProject} t={t} />}
     </div>
   );
 }
