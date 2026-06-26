@@ -11,6 +11,7 @@ type FileTreeNodeProps = {
   viewMode: FileTreeViewMode;
   expandedDirs: Set<string>;
   onItemClick: (item: FileTreeNodeType) => void;
+  activeFilePath?: string | null;
   renderFileIcon: (filename: string) => ReactNode;
   formatFileSize: (bytes?: number) => string;
   formatRelativeTime: (date?: string) => string;
@@ -65,6 +66,7 @@ export default function FileTreeNode({
   viewMode,
   expandedDirs,
   onItemClick,
+  activeFilePath = null,
   renderFileIcon,
   formatFileSize,
   formatRelativeTime,
@@ -87,10 +89,12 @@ export default function FileTreeNode({
   const isOpen = isDirectory && expandedDirs.has(item.path);
   const hasChildren = Boolean(isDirectory && item.children && item.children.length > 0);
   const isRenaming = renamingItem?.path === item.path;
+  const isActive = !isDirectory && activeFilePath !== null && item.path.replace(/\\/g, '/') === activeFilePath.replace(/\\/g, '/');
 
   const nameClassName = cn(
     'text-[13px] leading-tight truncate',
     isDirectory ? 'font-medium text-foreground' : 'text-foreground/90',
+    isActive && 'text-primary font-medium',
   );
 
   // View mode only changes the row layout; selection, expansion, and recursion stay shared.
@@ -102,6 +106,7 @@ export default function FileTreeNode({
       : 'group flex items-center gap-1.5 py-[3px] pr-2 cursor-pointer rounded-sm hover:bg-accent/60 transition-colors duration-100',
     isDirectory && isOpen && 'border-l-2 border-primary/30',
     (isDirectory && !isOpen) || !isDirectory ? 'border-l-2 border-transparent' : '',
+    isActive && 'bg-accent',
   );
 
   // Render rename input if this item is being renamed
@@ -214,6 +219,7 @@ export default function FileTreeNode({
               viewMode={viewMode}
               expandedDirs={expandedDirs}
               onItemClick={onItemClick}
+              activeFilePath={activeFilePath}
               renderFileIcon={renderFileIcon}
               formatFileSize={formatFileSize}
               formatRelativeTime={formatRelativeTime}

@@ -128,6 +128,28 @@
       "label": "Koyu Mod",
       "description": "Açık ve koyu temalar arasında geçiş yap"
     },
+    "colorTheme": {
+      "label": "Renk teması",
+      "description": "Hazır palet veya özel renkler seçin",
+      "orca": "Orca",
+      "classic": "Klasik",
+      "slate": "Arduvaz",
+      "custom": "Özel",
+      "customDescription": "Açık ve koyu mod renklerini ayarlayın. Değişiklikler anında uygulanır.",
+      "lightMode": "Açık mod",
+      "darkMode": "Koyu mod",
+      "resetCustom": "Varsayılana sıfırla",
+      "pickColor": "Renk seç",
+      "hexPlaceholder": "#RRGGBB",
+      "colors": {
+        "background": "Arka plan",
+        "foreground": "Metin",
+        "primary": "Vurgu",
+        "card": "Kart",
+        "border": "Kenarlık",
+        "muted": "Soluk"
+      }
+    },
     "projectSorting": {
       "label": "Proje Sıralama",
       "description": "Projelerin kenar çubuğunda nasıl sıralanacağı",
@@ -453,7 +475,7 @@
   },
   "pluginSettings": {
     "title": "Eklentiler",
-    "description": "Arayüzü özel eklentilerle genişlet. Git'ten yükle veya ~/.claude-code-ui/plugins/ klasörüne bir dizin bırak.",
+    "description": "Arayüzü özel eklentilerle genişlet. Git'ten yükle veya ~/.orca/plugins/ klasörüne bir dizin bırak.",
     "installPlaceholder": "https://github.com/kullanici/benim-eklentim",
     "installButton": "Yükle",
     "installing": "Yükleniyor…",

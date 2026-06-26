@@ -4,6 +4,7 @@ import type { Extension } from '@codemirror/state';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { usePaletteOps } from '../../../contexts/PaletteOpsContext';
+import { isImageFile } from '../../../utils/fileExtensions';
 import { useCodeEditorDocument } from '../hooks/useCodeEditorDocument';
 import { useCodeEditorSettings } from '../hooks/useCodeEditorSettings';
 import { useEditorKeyboardShortcuts } from '../hooks/useEditorKeyboardShortcuts';
@@ -13,6 +14,7 @@ import { getEditorStyles } from '../utils/editorStyles';
 import { createEditorToolbarPanelExtension } from '../utils/editorToolbarPanel';
 import CodeEditorFooter from './subcomponents/CodeEditorFooter';
 import CodeEditorHeader from './subcomponents/CodeEditorHeader';
+import CodeEditorImagePreview from './subcomponents/CodeEditorImagePreview';
 import CodeEditorLoadingState from './subcomponents/CodeEditorLoadingState';
 import CodeEditorSurface from './subcomponents/CodeEditorSurface';
 import CodeEditorBinaryFile from './subcomponents/CodeEditorBinaryFile';
@@ -27,7 +29,15 @@ type CodeEditorProps = {
   onPopOut?: (() => void) | null;
 };
 
-export default function CodeEditor({
+export default function CodeEditor(props: CodeEditorProps) {
+  if (isImageFile(props.file.name)) {
+    return <CodeEditorImagePreview {...props} />;
+  }
+
+  return <CodeEditorText {...props} />;
+}
+
+function CodeEditorText({
   file,
   onClose,
   projectPath,

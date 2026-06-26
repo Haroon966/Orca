@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { ORCA_GITHUB } from '../../../config/orca';
 import { useDeviceSettings } from '../../../hooks/useDeviceSettings';
 import { useVersionCheck } from '../../../hooks/useVersionCheck';
 import { useUiPreferences } from '../../../hooks/useUiPreferences';
@@ -44,8 +45,8 @@ function Sidebar({
   const { t } = useTranslation(['sidebar', 'common']);
   const { isPWA } = useDeviceSettings({ trackMobile: false });
   const { updateAvailable, restartRequired, latestVersion, currentVersion, releaseInfo, installMode } = useVersionCheck(
-    'siteboon',
-    'claudecodeui',
+    ORCA_GITHUB.owner,
+    ORCA_GITHUB.repo,
   );
   const { preferences, setPreference } = useUiPreferences();
   const { sidebarVisible } = preferences;

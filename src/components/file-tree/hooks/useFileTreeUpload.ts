@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { DragEvent } from 'react';
 
-import { AUTH_BYPASS } from '../../../constants/config';
 import type { Project } from '../../../types/app';
 import {
   MAX_FILE_UPLOAD_COUNT,
@@ -114,11 +113,6 @@ const uploadFormDataWithProgress = (
 
     xhr.open('POST', `/api/projects/${encodeURIComponent(projectId)}/files/upload`);
 
-    const token = localStorage.getItem('auth-token');
-    if (!AUTH_BYPASS && token) {
-      xhr.setRequestHeader('Authorization', `Bearer ${token}`);
-    }
-
     xhr.upload.onprogress = (event) => {
       if (!event.lengthComputable) {
         return;
@@ -130,11 +124,6 @@ const uploadFormDataWithProgress = (
     };
 
     xhr.onload = () => {
-      const refreshedToken = xhr.getResponseHeader('X-Refreshed-Token');
-      if (refreshedToken) {
-        localStorage.setItem('auth-token', refreshedToken);
-      }
-
       const payload = parseUploadResponse(xhr);
       if (xhr.status >= 200 && xhr.status < 300) {
         resolve(payload);

@@ -3,7 +3,7 @@
   "displayName": "Project Stats",
   "version": "1.0.0",
   "description": "A starter plugin that shows project stats and demonstrates the full plugin API.",
-  "author": "CloudCLI UI",
+  "author": "Orca",
   "icon": "icon.svg",
   "type": "module",
   "slot": "tab",

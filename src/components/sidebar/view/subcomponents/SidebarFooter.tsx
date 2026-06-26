@@ -1,6 +1,7 @@
 import { Settings, ArrowUpCircle, AlertTriangle } from 'lucide-react';
 import type { TFunction } from 'i18next';
 import { IS_PLATFORM } from '../../../../constants/config';
+import { ORCA_PRODUCT_NAME } from '../../../../config/orca';
 import type { ReleaseInfo } from '../../../../types/sharedTypes';
 
 type SidebarFooterProps = {
@@ -108,7 +109,7 @@ export default function SidebarFooter({
       {!IS_PLATFORM && (
         <div className="hidden px-3 py-2 text-center md:block">
           <span className="text-[10px] text-muted-foreground/40">
-            CloudCLI v{currentVersion}
+            {ORCA_PRODUCT_NAME} v{currentVersion}
           </span>
         </div>
       )}

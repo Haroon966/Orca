@@ -1,6 +1,4 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { useAuth } from '../components/auth/context/AuthContext';
-import { AUTH_BYPASS } from '../constants/config';
 
 /**
  * One frame received from the chat websocket. The server guarantees every
@@ -51,11 +49,9 @@ export const useWebSocket = () => {
   return context;
 };
 
-const buildWebSocketUrl = (token: string | null) => {
+const buildWebSocketUrl = () => {
   const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-  if (AUTH_BYPASS) return `${protocol}//${window.location.host}/ws`; // No token required
-  if (!token) return null;
-  return `${protocol}//${window.location.host}/ws?token=${encodeURIComponent(token)}`; // OSS mode: Use same host:port that served the page
+  return `${protocol}//${window.location.host}/ws`;
 };
 
 const useWebSocketProviderState = (): WebSocketContextType => {
@@ -71,7 +67,6 @@ const useWebSocketProviderState = (): WebSocketContextType => {
   const [latestMessage, setLatestMessage] = useState<ServerEvent | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const { token } = useAuth();
 
   const dispatch = useCallback((event: ServerEvent) => {
     for (const listener of listenersRef.current) {
@@ -84,31 +79,11 @@ const useWebSocketProviderState = (): WebSocketContextType => {
     setLatestMessage(event);
   }, []);
 
-  useEffect(() => {
-    // The cleanup below sets unmountedRef = true. Without this reset, every
-    // re-run of the effect (e.g. on token refresh) would short-circuit connect()
-    // at its unmounted guard and leave the socket permanently disconnected.
-    unmountedRef.current = false;
-    connect();
-
-    return () => {
-      unmountedRef.current = true;
-      if (reconnectTimeoutRef.current) {
-        clearTimeout(reconnectTimeoutRef.current);
-      }
-      if (wsRef.current) {
-        wsRef.current.close();
-      }
-    };
-  }, [token]); // everytime token changes, we reconnect
-
   const connect = useCallback(() => {
     if (unmountedRef.current) return; // Prevent connection if unmounted
     try {
       // Construct WebSocket URL
-      const wsUrl = buildWebSocketUrl(token);
-
-      if (!wsUrl) return console.warn('No authentication token found for WebSocket connection');
+      const wsUrl = buildWebSocketUrl();
 
       const websocket = new WebSocket(wsUrl);
 
@@ -149,7 +124,24 @@ const useWebSocketProviderState = (): WebSocketContextType => {
     } catch (error) {
       console.error('Error creating WebSocket connection:', error);
     }
-  }, [token, dispatch]); // everytime token changes, we reconnect
+  }, [dispatch]);
+
+  useEffect(() => {
+    // The cleanup below sets unmountedRef = true. Without this reset, every
+    // re-run of the effect would short-circuit connect() at its unmounted guard.
+    unmountedRef.current = false;
+    connect();
+
+    return () => {
+      unmountedRef.current = true;
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
+      }
+      if (wsRef.current) {
+        wsRef.current.close();
+      }
+    };
+  }, [connect]);
 
   const sendMessage = useCallback((message: unknown) => {
     const socket = wsRef.current;

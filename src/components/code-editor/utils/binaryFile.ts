@@ -1,4 +1,4 @@
-// Binary file extensions (images are handled by ImageViewer, not here)
+// Binary file extensions (images are handled by CodeEditorImagePreview)
 const BINARY_EXTENSIONS = [
   // Archives
   'zip', 'tar', 'gz', 'rar', '7z', 'bz2', 'xz',

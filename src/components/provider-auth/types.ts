@@ -1,4 +1,5 @@
 import type { LLMProvider } from '../../types/app';
+import { ORCA_ENABLED_PROVIDERS } from '../../config/orca';
 
 export type ProviderAuthStatus = {
   authenticated: boolean;
@@ -8,24 +9,34 @@ export type ProviderAuthStatus = {
   loading: boolean;
 };
 
+export type ClaudeProviderAuthStatus = ProviderAuthStatus;
+
 export type ProviderAuthStatusMap = Record<LLMProvider, ProviderAuthStatus>;
 
-import { CLAUDEUI_ENABLED_PROVIDERS } from '../../config/claudeui';
+export const CLI_PROVIDERS: LLMProvider[] = ORCA_ENABLED_PROVIDERS;
 
-export const CLI_PROVIDERS: LLMProvider[] = CLAUDEUI_ENABLED_PROVIDERS;
+export const CLAUDE_AUTH_STATUS_ENDPOINT = '/api/providers/claude/auth/status';
 
 export const PROVIDER_AUTH_STATUS_ENDPOINTS: Record<LLMProvider, string> = {
-  claude: '/api/providers/claude/auth/status',
+  claude: CLAUDE_AUTH_STATUS_ENDPOINT,
   cursor: '/api/providers/cursor/auth/status',
   codex: '/api/providers/codex/auth/status',
   gemini: '/api/providers/gemini/auth/status',
   opencode: '/api/providers/opencode/auth/status',
 };
 
+const emptyStatus = (loading: boolean): ProviderAuthStatus => ({
+  authenticated: false,
+  email: null,
+  method: null,
+  error: null,
+  loading,
+});
+
 export const createInitialProviderAuthStatusMap = (loading = true): ProviderAuthStatusMap => ({
-  claude: { authenticated: false, email: null, method: null, error: null, loading },
-  cursor: { authenticated: false, email: null, method: null, error: null, loading },
-  codex: { authenticated: false, email: null, method: null, error: null, loading },
-  gemini: { authenticated: false, email: null, method: null, error: null, loading },
-  opencode: { authenticated: false, email: null, method: null, error: null, loading },
+  claude: emptyStatus(loading),
+  cursor: emptyStatus(false),
+  codex: emptyStatus(false),
+  gemini: emptyStatus(false),
+  opencode: emptyStatus(false),
 });

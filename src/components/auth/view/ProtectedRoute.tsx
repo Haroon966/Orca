@@ -1,36 +1,17 @@
 import type { ReactNode } from 'react';
-import { AUTH_BYPASS, DISABLE_AUTH } from '../../../constants/config';
 import { useAuth } from '../context/AuthContext';
 import Onboarding from '../../onboarding/view/Onboarding';
 import AuthLoadingScreen from './AuthLoadingScreen';
-import LoginForm from './LoginForm';
-import SetupForm from './SetupForm';
 
 type ProtectedRouteProps = {
   children: ReactNode;
 };
 
 export default function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { user, isLoading, needsSetup, hasCompletedOnboarding, refreshOnboardingStatus } = useAuth();
+  const { isLoading, hasCompletedOnboarding, refreshOnboardingStatus } = useAuth();
 
   if (isLoading) {
     return <AuthLoadingScreen />;
-  }
-
-  if (AUTH_BYPASS) {
-    if (!DISABLE_AUTH && !hasCompletedOnboarding) {
-      return <Onboarding onComplete={refreshOnboardingStatus} />;
-    }
-
-    return <>{children}</>;
-  }
-
-  if (needsSetup) {
-    return <SetupForm />;
-  }
-
-  if (!user) {
-    return <LoginForm />;
   }
 
   if (!hasCompletedOnboarding) {

@@ -316,7 +316,7 @@ export default function Shell({
             connectLabel={t('shell.actions.connect')}
             connectTitle={t('shell.actions.connectTitle')}
             connectingLabel={t('shell.connecting')}
-            onConnect={handleRestartShell}
+            onConnect={() => connectToShell()}
           />
         )}
 

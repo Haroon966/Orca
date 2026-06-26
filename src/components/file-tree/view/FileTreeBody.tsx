@@ -12,6 +12,7 @@ type FileTreeBodyProps = {
   viewMode: FileTreeViewMode;
   expandedDirs: Set<string>;
   onItemClick: (item: FileTreeNode) => void;
+  activeFilePath?: string | null;
   renderFileIcon: (filename: string) => ReactNode;
   formatFileSize: (bytes?: number) => string;
   formatRelativeTime: (date?: string) => string;
@@ -39,6 +40,7 @@ export default function FileTreeBody({
   viewMode,
   expandedDirs,
   onItemClick,
+  activeFilePath = null,
   renderFileIcon,
   formatFileSize,
   formatRelativeTime,
@@ -79,6 +81,7 @@ export default function FileTreeBody({
           viewMode={viewMode}
           expandedDirs={expandedDirs}
           onItemClick={onItemClick}
+          activeFilePath={activeFilePath}
           renderFileIcon={renderFileIcon}
           formatFileSize={formatFileSize}
           formatRelativeTime={formatRelativeTime}

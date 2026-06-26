@@ -1,6 +1,5 @@
 import { Check, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { LLMProvider } from '../../../types/app';
 import { authenticatedFetch } from '../../../utils/api';
 import { useProviderAuthStatus } from '../../provider-auth/hooks/useProviderAuthStatus';
 import ProviderLoginModal from '../../provider-auth/view/ProviderLoginModal';
@@ -22,14 +21,14 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
   const [gitEmail, setGitEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const [activeLoginProvider, setActiveLoginProvider] = useState<LLMProvider | null>(null);
+  const [activeClaudeLogin, setActiveClaudeLogin] = useState(false);
   const {
     providerAuthStatus,
     checkProviderAuthStatus,
     refreshProviderAuthStatuses,
   } = useProviderAuthStatus();
 
-  const previousActiveLoginProviderRef = useRef<LLMProvider | null | undefined>(undefined);
+  const previousActiveLoginRef = useRef<boolean | undefined>(undefined);
 
   const loadGitConfig = useCallback(async () => {
     try {
@@ -52,30 +51,25 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
 
   useEffect(() => {
     void loadGitConfig();
-    void refreshProviderAuthStatuses();
+    void refreshProviderAuthStatuses(['claude']);
   }, [loadGitConfig, refreshProviderAuthStatuses]);
 
   useEffect(() => {
-    const previousProvider = previousActiveLoginProviderRef.current;
-    previousActiveLoginProviderRef.current = activeLoginProvider;
+    const previousActive = previousActiveLoginRef.current;
+    previousActiveLoginRef.current = activeClaudeLogin;
 
-    const didCloseModal = previousProvider !== undefined
-      && previousProvider !== null
-      && activeLoginProvider === null;
-
-    // Refresh statuses after the login modal is closed.
-    if (didCloseModal) {
-      void refreshProviderAuthStatuses();
+    if (previousActive && !activeClaudeLogin) {
+      void refreshProviderAuthStatuses(['claude']);
     }
-  }, [activeLoginProvider, refreshProviderAuthStatuses]);
+  }, [activeClaudeLogin, refreshProviderAuthStatuses]);
 
-  const handleProviderLoginOpen = (provider: LLMProvider) => {
-    setActiveLoginProvider(provider);
+  const handleClaudeLoginOpen = () => {
+    setActiveClaudeLogin(true);
   };
 
   const handleLoginComplete = (exitCode: number) => {
-    if (exitCode === 0 && activeLoginProvider) {
-      void checkProviderAuthStatus(activeLoginProvider);
+    if (exitCode === 0) {
+      void checkProviderAuthStatus('claude');
     }
   };
 
@@ -163,8 +157,8 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
               />
             ) : (
               <AgentConnectionsStep
-                providerStatuses={providerAuthStatus}
-                onOpenProviderLogin={handleProviderLoginOpen}
+                claudeStatus={providerAuthStatus.claude}
+                onOpenClaudeLogin={handleClaudeLoginOpen}
               />
             )}
 
@@ -228,11 +222,11 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
         </div>
       </div>
 
-      {activeLoginProvider && (
+      {activeClaudeLogin && (
         <ProviderLoginModal
-          isOpen={Boolean(activeLoginProvider)}
-          onClose={() => setActiveLoginProvider(null)}
-          provider={activeLoginProvider}
+          isOpen={activeClaudeLogin}
+          onClose={() => setActiveClaudeLogin(false)}
+          provider="claude"
           onComplete={handleLoginComplete}
         />
       )}

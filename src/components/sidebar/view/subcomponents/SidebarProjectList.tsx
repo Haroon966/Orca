@@ -1,6 +1,8 @@
 import { useEffect } from 'react';
 import type { TFunction } from 'i18next';
 
+import { ORCA_PRODUCT_NAME } from '../../../../config/orca';
+
 import type { LoadingProgress, Project, ProjectSession, LLMProvider } from '../../../../types/app';
 import type { SessionActivityMap } from '../../../../hooks/useSessionProtection';
 import type { MCPServerStatus, SessionWithProvider } from '../../types/types';
@@ -105,7 +107,7 @@ export default function SidebarProjectList({
   );
 
   useEffect(() => {
-    let baseTitle = 'CloudCLI UI';
+    let baseTitle = ORCA_PRODUCT_NAME;
     const displayName = selectedProject?.displayName?.trim();
     if (displayName) {
       baseTitle = `${displayName} - ${baseTitle}`;

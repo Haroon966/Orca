@@ -128,6 +128,28 @@
       "label": "Темная тема",
       "description": "Переключение между светлой и темной темами"
     },
+    "colorTheme": {
+      "label": "Цветовая тема",
+      "description": "Выберите готовую палитру или настройте свои цвета",
+      "orca": "Orca",
+      "classic": "Классика",
+      "slate": "Сланец",
+      "custom": "Своя",
+      "customDescription": "Настройте цвета для светлой и тёмной темы. Изменения применяются сразу.",
+      "lightMode": "Светлая тема",
+      "darkMode": "Тёмная тема",
+      "resetCustom": "Сбросить",
+      "pickColor": "Выбрать цвет",
+      "hexPlaceholder": "#RRGGBB",
+      "colors": {
+        "background": "Фон",
+        "foreground": "Текст",
+        "primary": "Акцент",
+        "card": "Карточка",
+        "border": "Граница",
+        "muted": "Приглушённый"
+      }
+    },
     "projectSorting": {
       "label": "Сортировка проектов",
       "description": "Как проекты упорядочены на боковой панели",
@@ -453,7 +475,7 @@
   },
   "pluginSettings": {
     "title": "Плагины",
-    "description": "Расширяйте интерфейс с помощью кастомных плагинов. Установите из git или добавьте папку в ~/.claude-code-ui/plugins/",
+    "description": "Расширяйте интерфейс с помощью кастомных плагинов. Установите из git или добавьте папку в ~/.orca/plugins/",
     "installPlaceholder": "https://github.com/user/my-plugin",
     "installButton": "Установить",
     "installing": "Установка…",

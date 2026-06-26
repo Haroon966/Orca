@@ -22,7 +22,76 @@
 }
 
 @layer base {
-  :root {
+  /* ── Orca (default): navy + ice ── */
+  :root[data-color-theme="orca"],
+  :root:not([data-color-theme]) {
+    --background: 207 100% 97%;
+    --foreground: 210 100% 4%;
+    --card: 0 0% 100%;
+    --card-foreground: 210 100% 4%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 210 100% 4%;
+    --primary: 198 100% 36%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 192 71% 92%;
+    --secondary-foreground: 206 100% 20%;
+    --muted: 192 50% 94%;
+    --muted-foreground: 206 50% 35%;
+    --accent: 192 71% 85%;
+    --accent-foreground: 206 100% 15%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 192 40% 88%;
+    --input: 192 40% 88%;
+    --ring: 198 100% 36%;
+    --radius: 0.5rem;
+    --nav-glass-bg: 207 100% 97% / 0.7;
+    --nav-glass-blur: 20px;
+    --nav-glass-saturate: 1.8;
+    --nav-tab-glow: 198 100% 36% / 0.18;
+    --nav-tab-ring: 198 100% 36% / 0.10;
+    --nav-float-shadow: 210 100% 4% / 0.06;
+    --nav-float-ring: 192 40% 88% / 0.5;
+    --nav-divider-color: 192 40% 88% / 0.5;
+    --nav-input-bg: 192 71% 92% / 0.5;
+    --nav-input-focus-ring: 198 100% 36% / 0.22;
+  }
+
+  .dark[data-color-theme="orca"],
+  .dark:not([data-color-theme]) {
+    --background: 210 100% 4%;
+    --foreground: 190 78% 89%;
+    --card: 206 80% 8%;
+    --card-foreground: 190 78% 89%;
+    --popover: 206 80% 8%;
+    --popover-foreground: 190 78% 89%;
+    --primary: 199 89% 48%;
+    --primary-foreground: 210 100% 4%;
+    --secondary: 206 100% 12%;
+    --secondary-foreground: 190 78% 89%;
+    --muted: 206 50% 14%;
+    --muted-foreground: 192 50% 70%;
+    --accent: 206 60% 18%;
+    --accent-foreground: 190 78% 89%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 190 78% 89%;
+    --border: 206 40% 18%;
+    --input: 206 40% 22%;
+    --ring: 199 89% 48%;
+    --nav-glass-bg: 206 80% 8% / 0.55;
+    --nav-glass-blur: 24px;
+    --nav-glass-saturate: 1.6;
+    --nav-tab-glow: 199 89% 48% / 0.25;
+    --nav-tab-ring: 199 89% 48% / 0.15;
+    --nav-float-shadow: 0 0% 0% / 0.35;
+    --nav-float-ring: 206 40% 18% / 0.3;
+    --nav-divider-color: 206 40% 18% / 0.5;
+    --nav-input-bg: 206 50% 14% / 0.5;
+    --nav-input-focus-ring: 199 89% 48% / 0.25;
+  }
+
+  /* ── Classic: original shadcn blue ── */
+  :root[data-color-theme="classic"] {
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
@@ -42,12 +111,7 @@
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
     --ring: 221.2 83.2% 53.3%;
-    --radius: 0.5rem;
-
-    /* Nav design tokens */
     --nav-glass-bg: 0 0% 100% / 0.7;
-    --nav-glass-blur: 20px;
-    --nav-glass-saturate: 1.8;
     --nav-tab-glow: 221.2 83.2% 53.3% / 0.18;
     --nav-tab-ring: 221.2 83.2% 53.3% / 0.10;
     --nav-float-shadow: 0 0% 0% / 0.06;
@@ -55,6 +119,103 @@
     --nav-divider-color: 214.3 31.8% 91.4% / 0.5;
     --nav-input-bg: 210 40% 96.1% / 0.5;
     --nav-input-focus-ring: 221.2 83.2% 53.3% / 0.22;
+  }
+
+  .dark[data-color-theme="classic"] {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 217.2 91.2% 8%;
+    --card-foreground: 210 40% 98%;
+    --popover: 217.2 91.2% 8%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 220 13% 46%;
+    --ring: 217.2 91.2% 59.8%;
+    --nav-glass-bg: 217.2 91.2% 8% / 0.55;
+    --nav-tab-glow: 217.2 91.2% 59.8% / 0.25;
+    --nav-tab-ring: 217.2 91.2% 59.8% / 0.15;
+    --nav-float-shadow: 0 0% 0% / 0.35;
+    --nav-float-ring: 217.2 32.6% 17.5% / 0.3;
+    --nav-divider-color: 217.2 32.6% 17.5% / 0.5;
+    --nav-input-bg: 217.2 32.6% 17.5% / 0.5;
+    --nav-input-focus-ring: 217.2 91.2% 59.8% / 0.25;
+  }
+
+  /* ── Slate: neutral gray ── */
+  :root[data-color-theme="slate"] {
+    --background: 210 40% 98%;
+    --foreground: 222.2 47.4% 11.2%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 47.4% 11.2%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 47.4% 11.2%;
+    --primary: 215.4 16.3% 46.9%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 215.4 16.3% 46.9%;
+    --nav-glass-bg: 210 40% 98% / 0.7;
+    --nav-tab-glow: 215.4 16.3% 46.9% / 0.18;
+    --nav-tab-ring: 215.4 16.3% 46.9% / 0.10;
+    --nav-float-shadow: 0 0% 0% / 0.06;
+    --nav-float-ring: 214.3 31.8% 91.4% / 0.5;
+    --nav-divider-color: 214.3 31.8% 91.4% / 0.5;
+    --nav-input-bg: 210 40% 96.1% / 0.5;
+    --nav-input-focus-ring: 215.4 16.3% 46.9% / 0.22;
+  }
+
+  .dark[data-color-theme="slate"] {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 217.2 32.6% 12%;
+    --card-foreground: 210 40% 98%;
+    --popover: 217.2 32.6% 12%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 215 20.2% 65.1%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 215 20.2% 65.1%;
+    --nav-glass-bg: 217.2 32.6% 12% / 0.55;
+    --nav-tab-glow: 215 20.2% 65.1% / 0.25;
+    --nav-tab-ring: 215 20.2% 65.1% / 0.15;
+    --nav-float-shadow: 0 0% 0% / 0.35;
+    --nav-float-ring: 217.2 32.6% 17.5% / 0.3;
+    --nav-divider-color: 217.2 32.6% 17.5% / 0.5;
+    --nav-input-bg: 217.2 32.6% 17.5% / 0.5;
+    --nav-input-focus-ring: 215 20.2% 65.1% / 0.25;
+  }
+
+  :root {
+    --radius: 0.5rem;
+    --nav-glass-blur: 20px;
+    --nav-glass-saturate: 1.8;
 
     /* Safe area CSS variables */
     --safe-area-inset-top: env(safe-area-inset-top);
@@ -84,39 +245,6 @@
     }
   }
 
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 217.2 91.2% 8%;
-    --card-foreground: 210 40% 98%;
-    --popover: 217.2 91.2% 8%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 220 13% 46%;
-    --ring: 217.2 91.2% 59.8%;
-
-    /* Nav design tokens — dark overrides */
-    --nav-glass-bg: 217.2 91.2% 8% / 0.55;
-    --nav-glass-blur: 24px;
-    --nav-glass-saturate: 1.6;
-    --nav-tab-glow: 217.2 91.2% 59.8% / 0.25;
-    --nav-tab-ring: 217.2 91.2% 59.8% / 0.15;
-    --nav-float-shadow: 0 0% 0% / 0.35;
-    --nav-float-ring: 217.2 32.6% 17.5% / 0.3;
-    --nav-divider-color: 217.2 32.6% 17.5% / 0.5;
-    --nav-input-bg: 217.2 32.6% 17.5% / 0.5;
-    --nav-input-focus-ring: 217.2 91.2% 59.8% / 0.25;
-  }
 }
 
 @layer base {

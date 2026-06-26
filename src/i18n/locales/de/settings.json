@@ -128,6 +128,28 @@
       "label": "Darkmode",
       "description": "Zwischen hellem und dunklem Design wechseln"
     },
+    "colorTheme": {
+      "label": "Farbschema",
+      "description": "Wähle ein voreingestelltes Schema oder eigene Farben",
+      "orca": "Orca",
+      "classic": "Klassisch",
+      "slate": "Schiefer",
+      "custom": "Benutzerdefiniert",
+      "customDescription": "Farben für Hell- und Dunkelmodus festlegen. Änderungen gelten sofort.",
+      "lightMode": "Hellmodus",
+      "darkMode": "Dunkelmodus",
+      "resetCustom": "Auf Standard zurücksetzen",
+      "pickColor": "Farbe wählen",
+      "hexPlaceholder": "#RRGGBB",
+      "colors": {
+        "background": "Hintergrund",
+        "foreground": "Text",
+        "primary": "Akzent",
+        "card": "Karte",
+        "border": "Rahmen",
+        "muted": "Gedämpft"
+      }
+    },
     "projectSorting": {
       "label": "Projektsortierung",
       "description": "Wie Projekte in der Seitenleiste angeordnet werden",
@@ -453,7 +475,7 @@
   },
   "pluginSettings": {
     "title": "Plugins",
-    "description": "Erweitere die Oberfläche mit eigenen Plugins. Installiere sie von Git oder lege einen Ordner in ~/.claude-code-ui/plugins/ ab.",
+    "description": "Erweitere die Oberfläche mit eigenen Plugins. Installiere sie von Git oder lege einen Ordner in ~/.orca/plugins/ ab.",
     "installPlaceholder": "https://github.com/benutzer/mein-plugin",
     "installButton": "Installieren",
     "installing": "Wird installiert…",

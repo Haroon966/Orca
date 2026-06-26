@@ -6,6 +6,7 @@ import MainContentTitle from './MainContentTitle';
 
 export default function MainContentHeader({
   activeTab,
+  sidePanel,
   setActiveTab,
   selectedProject,
   selectedSession,
@@ -43,7 +44,6 @@ export default function MainContentHeader({
             activeTab={activeTab}
             selectedProject={selectedProject}
             selectedSession={selectedSession}
-            shouldShowTasksTab={shouldShowTasksTab}
           />
         </div>
 
@@ -58,6 +58,7 @@ export default function MainContentHeader({
           >
             <MainContentTabSwitcher
               activeTab={activeTab}
+              sidePanel={sidePanel}
               setActiveTab={setActiveTab}
               shouldShowTasksTab={shouldShowTasksTab}
               shouldShowBrowserTab={shouldShowBrowserTab}

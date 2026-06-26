@@ -1,6 +1,6 @@
-import { useCallback, useState, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AlertTriangle, Check, X, Loader2, Folder, Upload } from 'lucide-react';
+import { AlertTriangle, Loader2, Folder, Upload } from 'lucide-react';
 
 import { cn } from '../../../lib/utils';
 import { ICON_SIZE_CLASS, getFileIconData } from '../constants/fileIcons';
@@ -10,43 +10,29 @@ import { useFileTreeOperations } from '../hooks/useFileTreeOperations';
 import { useFileTreeSearch } from '../hooks/useFileTreeSearch';
 import { useFileTreeViewMode } from '../hooks/useFileTreeViewMode';
 import { useFileTreeUpload } from '../hooks/useFileTreeUpload';
-import type { FileTreeImageSelection, FileTreeNode } from '../types/types';
-import { formatFileSize, formatRelativeTime, isImageFile } from '../utils/fileTreeUtils';
+import type { FileTreeNode } from '../types/types';
+import { formatFileSize, formatRelativeTime } from '../utils/fileTreeUtils';
 import { Project } from '../../../types/app';
-import { ScrollArea, Input } from '../../../shared/view/ui';
+import { ScrollArea, Input, useToast } from '../../../shared/view/ui';
 
 import FileTreeBody from './FileTreeBody';
 import FileTreeDetailedColumns from './FileTreeDetailedColumns';
 import FileTreeHeader from './FileTreeHeader';
 import FileTreeLoadingState from './FileTreeLoadingState';
 import FileTreeUploadProgress from './FileTreeUploadProgress';
-import ImageViewer from './ImageViewer';
 
 
 type FileTreeProps = {
   selectedProject: Project | null;
   onFileOpen?: (filePath: string) => void;
+  activeFilePath?: string | null;
 };
 
-export default function FileTree({ selectedProject, onFileOpen }: FileTreeProps) {
+export default function FileTree({ selectedProject, onFileOpen, activeFilePath = null }: FileTreeProps) {
   const { t } = useTranslation();
-  const [selectedImage, setSelectedImage] = useState<FileTreeImageSelection | null>(null);
-  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const { showToast } = useToast();
   const newItemInputRef = useRef<HTMLInputElement>(null);
   const renameInputRef = useRef<HTMLInputElement>(null);
-
-  // Show toast notification
-  const showToast = useCallback((message: string, type: 'success' | 'error') => {
-    setToast({ message, type });
-  }, []);
-
-  // Auto-hide toast
-  useEffect(() => {
-    if (toast) {
-      const timer = setTimeout(() => setToast(null), 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [toast]);
 
   const { files, loading, refreshFiles } = useFileTreeData(selectedProject);
   const { viewMode, changeViewMode } = useFileTreeViewMode();
@@ -100,21 +86,9 @@ export default function FileTree({ selectedProject, onFileOpen }: FileTreeProps)
         return;
       }
 
-      if (isImageFile(item.name) && selectedProject) {
-        setSelectedImage({
-          name: item.name,
-          path: item.path,
-          projectPath: selectedProject.path,
-          // Image URL uses the DB projectId so ImageViewer can hit the
-          // /api/projects/:projectId/files/content endpoint directly.
-          projectId: selectedProject.projectId,
-        });
-        return;
-      }
-
       onFileOpen?.(item.path);
     },
-    [onFileOpen, selectedProject, toggleDirectory],
+    [onFileOpen, toggleDirectory],
   );
 
   const formatRelativeTimeLabel = useCallback(
@@ -205,6 +179,7 @@ export default function FileTree({ selectedProject, onFileOpen }: FileTreeProps)
           viewMode={viewMode}
           expandedDirs={expandedDirs}
           onItemClick={handleItemClick}
+          activeFilePath={activeFilePath}
           renderFileIcon={renderFileIcon}
           formatFileSize={formatFileSize}
           formatRelativeTime={formatRelativeTimeLabel}
@@ -225,13 +200,6 @@ export default function FileTree({ selectedProject, onFileOpen }: FileTreeProps)
           operationLoading={operationLoading}
         />
       </ScrollArea>
-
-      {selectedImage && (
-        <ImageViewer
-          file={selectedImage}
-          onClose={() => setSelectedImage(null)}
-        />
-      )}
 
       {/* Delete Confirmation Dialog */}
       {operations.deleteConfirmation.isOpen && operations.deleteConfirmation.item && (
@@ -278,24 +246,6 @@ export default function FileTree({ selectedProject, onFileOpen }: FileTreeProps)
         </div>
       )}
 
-      {/* Toast Notification */}
-      {toast && (
-        <div
-          className={cn(
-            'fixed bottom-4 right-4 z-[9999] px-4 py-2 rounded-lg shadow-lg flex items-center gap-2 animate-in slide-in-from-bottom-2',
-            toast.type === 'success'
-              ? 'bg-green-600 text-white'
-              : 'bg-red-600 text-white'
-          )}
-        >
-          {toast.type === 'success' ? (
-            <Check className="h-4 w-4" />
-          ) : (
-            <X className="h-4 w-4" />
-          )}
-          <span className="text-sm">{toast.message}</span>
-        </div>
-      )}
     </div>
   );
 }

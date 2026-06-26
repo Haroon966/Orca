@@ -128,6 +128,28 @@
       "label": "Modalità scura",
       "description": "Alterna tra tema chiaro e scuro"
     },
+    "colorTheme": {
+      "label": "Tema colore",
+      "description": "Scegli una palette predefinita o colori personalizzati",
+      "orca": "Orca",
+      "classic": "Classico",
+      "slate": "Ardesia",
+      "custom": "Personalizzato",
+      "customDescription": "Scegli i colori per modalità chiara e scura. Le modifiche si applicano subito.",
+      "lightMode": "Modalità chiara",
+      "darkMode": "Modalità scura",
+      "resetCustom": "Ripristina predefiniti",
+      "pickColor": "Scegli un colore",
+      "hexPlaceholder": "#RRGGBB",
+      "colors": {
+        "background": "Sfondo",
+        "foreground": "Testo",
+        "primary": "Accento",
+        "card": "Scheda",
+        "border": "Bordo",
+        "muted": "Smorzato"
+      }
+    },
     "projectSorting": {
       "label": "Ordinamento progetti",
       "description": "Come vengono ordinati i progetti nella barra laterale",
@@ -453,7 +475,7 @@
   },
   "pluginSettings": {
     "title": "Plugin",
-    "description": "Estendi l'interfaccia con plugin personalizzati. Installa da git o inserisci una cartella in ~/.claude-code-ui/plugins/",
+    "description": "Estendi l'interfaccia con plugin personalizzati. Installa da git o inserisci una cartella in ~/.orca/plugins/",
     "installPlaceholder": "https://github.com/utente/mio-plugin",
     "installButton": "Installa",
     "installing": "Installazione…",

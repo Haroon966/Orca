@@ -1,17 +1,14 @@
-<svg
-  xmlns="http://www.w3.org/2000/svg"
-  width="32"
-  height="32"
-  viewBox="0 0 32 32"
-  fill="none"
->
-  <rect width="32" height="32" rx="8" fill="hsl(221.2 83.2% 53.3%)"/>
-  <path
-    d="M8 9C8 8.44772 8.44772 8 9 8H23C23.5523 8 24 8.44772 24 9V18C24 18.5523 23.5523 19 23 19H12L8 23V9Z"
-    stroke="white"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    fill="none"
-  />
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="orcaGrad" x1="32" y1="4" x2="32" y2="60" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#000814"/>
+      <stop offset="50%" stop-color="#0077b6"/>
+      <stop offset="100%" stop-color="#caf0f8"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="url(#orcaGrad)"/>
+  <path d="M18 36c4-8 10-12 14-12s10 4 14 12" stroke="#caf0f8" stroke-width="3" stroke-linecap="round"/>
+  <ellipse cx="26" cy="30" rx="3" ry="4" fill="#000814"/>
+  <ellipse cx="38" cy="30" rx="3" ry="4" fill="#000814"/>
+  <path d="M32 18c-2 0-4 2-4 5v3" stroke="#90e0ef" stroke-width="2" stroke-linecap="round"/>
 </svg>

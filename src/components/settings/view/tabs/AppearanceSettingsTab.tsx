@@ -6,6 +6,7 @@ import SettingsCard from '../SettingsCard';
 import SettingsRow from '../SettingsRow';
 import SettingsSection from '../SettingsSection';
 import SettingsToggle from '../SettingsToggle';
+import ColorThemePicker from '../ColorThemePicker';
 
 type AppearanceSettingsTabProps = {
   projectSortOrder: ProjectSortOrder;
@@ -40,6 +41,20 @@ export default function AppearanceSettingsTab({
           >
             <DarkModeToggle ariaLabel={t('appearanceSettings.darkMode.label')} />
           </SettingsRow>
+        </SettingsCard>
+      </SettingsSection>
+
+      <SettingsSection title={t('appearanceSettings.colorTheme.label')}>
+        <SettingsCard className="p-4">
+          <div className="mb-4">
+            <div className="text-sm font-medium text-foreground">
+              {t('appearanceSettings.colorTheme.label')}
+            </div>
+            <p className="mt-0.5 text-sm text-muted-foreground">
+              {t('appearanceSettings.colorTheme.description')}
+            </p>
+          </div>
+          <ColorThemePicker />
         </SettingsCard>
       </SettingsSection>
 

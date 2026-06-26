@@ -1,18 +1,9 @@
-import { AUTH_BYPASS } from "../constants/config";
-
-// Utility function for authenticated API calls
+// Utility function for API calls (ClaudeUI has no app-level JWT auth)
 export const authenticatedFetch = (url, options = {}) => {
-  const token = localStorage.getItem('auth-token');
-
   const defaultHeaders = {};
 
-  // Only set Content-Type for non-FormData requests
   if (!(options.body instanceof FormData)) {
     defaultHeaders['Content-Type'] = 'application/json';
-  }
-
-  if (!AUTH_BYPASS && token) {
-    defaultHeaders['Authorization'] = `Bearer ${token}`;
   }
 
   return fetch(url, {
@@ -21,34 +12,11 @@ export const authenticatedFetch = (url, options = {}) => {
       ...defaultHeaders,
       ...options.headers,
     },
-  }).then((response) => {
-    const refreshedToken = response.headers.get('X-Refreshed-Token');
-    if (refreshedToken) {
-      localStorage.setItem('auth-token', refreshedToken);
-    }
-    return response;
   });
 };
 
 // API endpoints
 export const api = {
-  // Auth endpoints (no token required)
-  auth: {
-    status: () => fetch('/api/auth/status'),
-    login: (username, password) => fetch('/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password }),
-    }),
-    register: (username, password) => fetch('/api/auth/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password }),
-    }),
-    user: () => authenticatedFetch('/api/auth/user'),
-    logout: () => authenticatedFetch('/api/auth/logout', { method: 'POST' }),
-  },
-
   // Protected endpoints
   // config endpoint removed - no longer needed (frontend uses window.location)
   // After the projectName → projectId migration the path/query identifier is
@@ -119,9 +87,7 @@ export const api = {
     });
   },
   searchConversationsUrl: (query, limit = 50) => {
-    const token = localStorage.getItem('auth-token');
     const params = new URLSearchParams({ q: query, limit: String(limit) });
-    if (token) params.set('token', token);
     return `/api/providers/search/sessions?${params.toString()}`;
   },
   createProject: (projectData) =>

@@ -1,4 +1,5 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import ChatInterface from '../../chat/view/ChatInterface';
 import FileTree from '../../file-tree/view/FileTree';
@@ -16,10 +17,13 @@ import { useEditorSidebar } from '../../code-editor/hooks/useEditorSidebar';
 import EditorSidebar from '../../code-editor/view/EditorSidebar';
 import type { Project } from '../../../types/app';
 import { TaskMasterPanel } from '../../task-master';
+import { usePlugins } from '../../../contexts/PluginsContext';
+import { useSidePanel } from '../hooks/useSidePanel';
 
 import MainContentHeader from './subcomponents/MainContentHeader';
 import MainContentStateView from './subcomponents/MainContentStateView';
 import ErrorBoundary from './ErrorBoundary';
+import SidePanel from './SidePanel';
 
 type TaskMasterContextValue = {
   currentProject?: Project | null;
@@ -36,7 +40,9 @@ function MainContent({
   selectedProject,
   selectedSession,
   activeTab,
+  sidePanel,
   setActiveTab,
+  setSidePanel,
   ws,
   sendMessage,
   isMobile,
@@ -52,12 +58,14 @@ function MainContent({
   externalMessageUpdate,
   newSessionTrigger,
 }: MainContentProps) {
+  const { t } = useTranslation();
+  const { plugins } = usePlugins();
   const { preferences } = useUiPreferences();
   const { autoExpandTools, showRawParameters, showThinking, autoScrollToBottom, sendByCtrlEnter } = preferences;
 
   const { currentProject, setCurrentProject } = useTaskMaster() as TaskMasterContextValue;
   const { tasksEnabled, isTaskMasterInstalled } = useTasksSettings() as TasksSettingsContextValue;
-  const [browserUseEnabled, setBrowserUseEnabled] = useState(false);
+  const [browserUseEnabled, setBrowserUseEnabled] = React.useState(false);
 
   const shouldShowTasksTab = Boolean(tasksEnabled && isTaskMasterInstalled);
   const shouldShowBrowserTab = browserUseEnabled;
@@ -66,7 +74,6 @@ function MainContent({
     editingFile,
     editorWidth,
     editorExpanded,
-    hasManualWidth,
     resizeHandleRef,
     handleFileOpen,
     handleCloseEditor,
@@ -77,9 +84,42 @@ function MainContent({
     isMobile,
   });
 
+  const {
+    panelWidth,
+    resizeHandleRef: sidePanelResizeHandleRef,
+    handleResizeStart: handleSidePanelResizeStart,
+  } = useSidePanel({ isMobile });
+
+  const sidePanelTitle = useMemo(() => {
+    if (!sidePanel) {
+      return '';
+    }
+
+    if (sidePanel === 'files') {
+      return t('mainContent.projectFiles');
+    }
+
+    if (sidePanel === 'git') {
+      return t('tabs.git');
+    }
+
+    if (sidePanel === 'tasks') {
+      return 'TaskMaster';
+    }
+
+    if (sidePanel === 'browser') {
+      return t('tabs.browser');
+    }
+
+    if (sidePanel.startsWith('plugin:')) {
+      const pluginName = sidePanel.replace('plugin:', '');
+      return plugins.find((plugin) => plugin.name === pluginName)?.displayName ?? pluginName;
+    }
+
+    return '';
+  }, [plugins, sidePanel, t]);
+
   useEffect(() => {
-    // Identify projects by DB `projectId`; the TaskMaster context uses the
-    // same identifier to key its internal maps.
     const selectedProjectId = selectedProject?.projectId;
     const currentProjectId = currentProject?.projectId;
 
@@ -89,10 +129,10 @@ function MainContent({
   }, [selectedProject, currentProject?.projectId, setCurrentProject]);
 
   useEffect(() => {
-    if (!shouldShowTasksTab && activeTab === 'tasks') {
-      setActiveTab('chat');
+    if (!shouldShowTasksTab && sidePanel === 'tasks') {
+      setSidePanel(null);
     }
-  }, [shouldShowTasksTab, activeTab, setActiveTab]);
+  }, [shouldShowTasksTab, setSidePanel, sidePanel]);
 
   const loadBrowserUseSettings = useCallback(async () => {
     try {
@@ -111,10 +151,10 @@ function MainContent({
   }, [loadBrowserUseSettings]);
 
   useEffect(() => {
-    if (!shouldShowBrowserTab && activeTab === 'browser') {
-      setActiveTab('chat');
+    if (!shouldShowBrowserTab && sidePanel === 'browser') {
+      setSidePanel(null);
     }
-  }, [shouldShowBrowserTab, activeTab, setActiveTab]);
+  }, [shouldShowBrowserTab, setSidePanel, sidePanel]);
 
   usePaletteOpsRegister({
     openFile: (filePath: string) => {
@@ -122,6 +162,46 @@ function MainContent({
       handleFileOpen(filePath);
     },
   });
+
+  const renderSidePanelContent = () => {
+    if (!sidePanel || !selectedProject) {
+      return null;
+    }
+
+    if (sidePanel === 'files') {
+      return (
+        <FileTree
+          selectedProject={selectedProject}
+          onFileOpen={handleFileOpen}
+          activeFilePath={editingFile?.path ?? null}
+        />
+      );
+    }
+
+    if (sidePanel === 'git') {
+      return <GitPanel selectedProject={selectedProject} isMobile={isMobile} onFileOpen={handleFileOpen} />;
+    }
+
+    if (sidePanel === 'tasks' && shouldShowTasksTab) {
+      return <TaskMasterPanel isVisible />;
+    }
+
+    if (sidePanel === 'browser' && shouldShowBrowserTab) {
+      return <BrowserUsePanel isVisible onShowSettings={onShowSettings} />;
+    }
+
+    if (sidePanel.startsWith('plugin:')) {
+      return (
+        <PluginTabContent
+          pluginName={sidePanel.replace('plugin:', '')}
+          selectedProject={selectedProject}
+          selectedSession={selectedSession}
+        />
+      );
+    }
+
+    return null;
+  };
 
   if (isLoading) {
     return <MainContentStateView mode="loading" isMobile={isMobile} onMenuClick={onMenuClick} />;
@@ -135,6 +215,7 @@ function MainContent({
     <div className="flex h-full flex-col">
       <MainContentHeader
         activeTab={activeTab}
+        sidePanel={sidePanel}
         setActiveTab={setActiveTab}
         selectedProject={selectedProject}
         selectedSession={selectedSession}
@@ -173,60 +254,40 @@ function MainContent({
             </ErrorBoundary>
           </div>
 
-          {activeTab === 'files' && (
-            <div className="h-full overflow-hidden">
-              <FileTree selectedProject={selectedProject} onFileOpen={handleFileOpen} />
-            </div>
-          )}
-
-          {activeTab === 'shell' && (
-            <div className="h-full w-full overflow-hidden">
-              <StandaloneShell
-                project={selectedProject}
-                session={selectedSession}
-                showHeader={false}
-                isActive={activeTab === 'shell'}
-              />
-            </div>
-          )}
-
-          {activeTab === 'git' && (
-            <div className="h-full overflow-hidden">
-              <GitPanel selectedProject={selectedProject} isMobile={isMobile} onFileOpen={handleFileOpen} />
-            </div>
-          )}
-
-          {shouldShowTasksTab && <TaskMasterPanel isVisible={activeTab === 'tasks'} />}
-
-          {shouldShowBrowserTab && activeTab === 'browser' && (
-            <div className="h-full overflow-hidden">
-              <BrowserUsePanel isVisible={activeTab === 'browser'} onShowSettings={onShowSettings} />
-            </div>
-          )}
-
-          {activeTab.startsWith('plugin:') && (
-            <div className="h-full overflow-hidden">
-              <PluginTabContent
-                pluginName={activeTab.replace('plugin:', '')}
-                selectedProject={selectedProject}
-                selectedSession={selectedSession}
-              />
-            </div>
-          )}
+          <div className={`h-full w-full overflow-hidden ${activeTab === 'shell' ? 'block' : 'hidden'}`}>
+            <StandaloneShell
+              project={selectedProject}
+              session={selectedSession}
+              showHeader={false}
+              isActive={activeTab === 'shell'}
+            />
+          </div>
         </div>
+
+        {sidePanel && (
+          <SidePanel
+            panel={sidePanel}
+            isMobile={isMobile}
+            panelWidth={panelWidth}
+            resizeHandleRef={sidePanelResizeHandleRef}
+            onResizeStart={handleSidePanelResizeStart}
+            onClose={() => setSidePanel(null)}
+            title={sidePanelTitle}
+          >
+            {renderSidePanelContent()}
+          </SidePanel>
+        )}
 
         <EditorSidebar
           editingFile={editingFile}
           isMobile={isMobile}
           editorExpanded={editorExpanded}
           editorWidth={editorWidth}
-          hasManualWidth={hasManualWidth}
           resizeHandleRef={resizeHandleRef}
           onResizeStart={handleResizeStart}
           onCloseEditor={handleCloseEditor}
           onToggleEditorExpand={handleToggleEditorExpand}
           projectPath={selectedProject.path}
-          fillSpace={activeTab === 'files'}
         />
       </div>
     </div>

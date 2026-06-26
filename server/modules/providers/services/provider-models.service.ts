@@ -43,7 +43,7 @@ type ProviderModelsCacheFile = {
 
 const getProviderModelsCachePath = (): string => path.join(
   os.homedir(),
-  '.cloudcli',
+  '.orca',
   'provider-models-cache.json',
 );
 

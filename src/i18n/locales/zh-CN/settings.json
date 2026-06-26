@@ -128,6 +128,28 @@
       "label": "深色模式",
       "description": "切换浅色和深色主题"
     },
+    "colorTheme": {
+      "label": "颜色主题",
+      "description": "选择预设配色或自定义颜色",
+      "orca": "Orca",
+      "classic": "经典",
+      "slate": "石板",
+      "custom": "自定义",
+      "customDescription": "为浅色和深色模式设置颜色，更改即时生效。",
+      "lightMode": "浅色模式",
+      "darkMode": "深色模式",
+      "resetCustom": "恢复默认",
+      "pickColor": "选择颜色",
+      "hexPlaceholder": "#RRGGBB",
+      "colors": {
+        "background": "背景",
+        "foreground": "文字",
+        "primary": "强调色",
+        "card": "卡片",
+        "border": "边框",
+        "muted": "柔和色"
+      }
+    },
     "projectSorting": {
       "label": "项目排序",
       "description": "项目在侧边栏中的排列方式",
@@ -453,7 +475,7 @@
   },
   "pluginSettings": {
     "title": "插件",
-    "description": "通过自定义插件扩展界面。从 git 安装或直接将文件夹放入 ~/.claude-code-ui/plugins/",
+    "description": "通过自定义插件扩展界面。从 git 安装或直接将文件夹放入 ~/.orca/plugins/",
     "installPlaceholder": "https://github.com/user/my-plugin",
     "installButton": "安装",
     "installing": "安装中…",

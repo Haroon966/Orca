@@ -4,8 +4,10 @@ import os from 'os';
 
 import { spawn } from 'cross-spawn';
 
-const PLUGINS_DIR = path.join(os.homedir(), '.claude-code-ui', 'plugins');
-const PLUGINS_CONFIG_PATH = path.join(os.homedir(), '.claude-code-ui', 'plugins.json');
+import { ORCA_PLUGINS_DIR, ORCA_PLUGINS_CONFIG } from '../constants/orca.js';
+
+const PLUGINS_DIR = ORCA_PLUGINS_DIR;
+const PLUGINS_CONFIG_PATH = ORCA_PLUGINS_CONFIG;
 
 const REQUIRED_MANIFEST_FIELDS = ['name', 'displayName', 'entry'];
 

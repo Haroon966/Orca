@@ -2,7 +2,6 @@ import { Activity, Archive, Folder, FolderPlus, MessageSquare, Plus, RefreshCw, 
 import type { TFunction } from 'i18next';
 
 import { Button, Input, Tooltip } from '../../../../shared/view/ui';
-import { IS_PLATFORM } from '../../../../constants/config';
 import { cn } from '../../../../lib/utils';
 import type { SidebarSearchMode } from '../../types/types';
 
@@ -61,9 +60,7 @@ export default function SidebarHeader({
   const LogoBlock = () => (
     <div className="flex min-w-0 items-center gap-2.5">
       <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg bg-primary/90 shadow-sm">
-        <svg className="h-3.5 w-3.5 text-primary-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
-          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-        </svg>
+        <img src="/logo.svg" alt="" className="h-3.5 w-3.5" />
       </div>
       <h1 className="truncate text-sm font-semibold tracking-tight text-foreground">{t('app.title')}</h1>
     </div>
@@ -77,17 +74,7 @@ export default function SidebarHeader({
         style={{}}
       >
         <div className="flex items-center justify-between gap-2">
-          {IS_PLATFORM ? (
-            <a
-              href="https://cloudcli.ai/dashboard"
-              className="flex min-w-0 items-center gap-2.5 transition-opacity hover:opacity-80"
-              title={t('tooltips.viewEnvironments')}
-            >
-              <LogoBlock />
-            </a>
-          ) : (
-            <LogoBlock />
-          )}
+          <LogoBlock />
 
           <div className="flex flex-shrink-0 items-center gap-0.5">
             <Button
@@ -237,17 +224,7 @@ export default function SidebarHeader({
         style={isPWA && isMobile ? { paddingTop: '16px' } : {}}
       >
         <div className="flex items-center justify-between">
-          {IS_PLATFORM ? (
-            <a
-              href="https://cloudcli.ai/dashboard"
-              className="flex min-w-0 items-center gap-2.5 transition-opacity active:opacity-70"
-              title={t('tooltips.viewEnvironments')}
-            >
-              <LogoBlock />
-            </a>
-          ) : (
-            <LogoBlock />
-          )}
+          <LogoBlock />
 
           <div className="flex flex-shrink-0 gap-1.5">
             <button

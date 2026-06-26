@@ -1,12 +1,12 @@
 {
-  "name": "@cloudcli-ai/cloudcli",
+  "name": "@orca-ai/orca",
   "version": "1.34.0",
-  "productName": "ClaudeUI",
-  "description": "ClaudeUI — web interface to manage Claude Code CLI (fork of CloudCLI)",
+  "productName": "Orca",
+  "description": "Orca — intelligent coding interface for Claude Code CLI",
   "type": "module",
   "main": "dist-server/server/index.js",
   "bin": {
-    "cloudcli": "dist-server/server/cli.js"
+    "orca": "dist-server/server/cli.js"
   },
   "files": [
     "electron/",
@@ -18,13 +18,13 @@
     "scripts/",
     "README.md"
   ],
-  "homepage": "https://cloudcli.ai",
+  "homepage": "https://github.com/YOUR_USER/orca",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/siteboon/claudecodeui.git"
+    "url": "git+https://github.com/YOUR_USER/orca.git"
   },
   "bugs": {
-    "url": "https://github.com/siteboon/claudecodeui/issues"
+    "url": "https://github.com/YOUR_USER/orca/issues"
   },
   "scripts": {
     "dev": "concurrently --kill-others \"npm run server:dev\" \"npm run client\"",
@@ -52,9 +52,9 @@
     "update:platform": "./update-platform.sh"
   },
   "build": {
-    "appId": "ai.cloudcli.desktop",
-    "productName": "CloudCLI",
-    "artifactName": "CloudCLI-${version}-${arch}.${ext}",
+    "appId": "ai.orca.desktop",
+    "productName": "Orca",
+    "artifactName": "Orca-${version}-${arch}.${ext}",
     "directories": {
       "output": "release"
     },
@@ -72,9 +72,9 @@
     ],
     "protocols": [
       {
-        "name": "CloudCLI",
+        "name": "Orca",
         "schemes": [
-          "cloudcli"
+          "orca"
         ]
       }
     ],
@@ -85,13 +85,13 @@
         "zip"
       ],
       "extendInfo": {
-        "CFBundleName": "CloudCLI",
-        "CFBundleDisplayName": "CloudCLI",
+        "CFBundleName": "Orca",
+        "CFBundleDisplayName": "Orca",
         "CFBundleURLTypes": [
           {
-            "CFBundleURLName": "CloudCLI",
+            "CFBundleURLName": "Orca",
             "CFBundleURLSchemes": [
-              "cloudcli"
+              "orca"
             ]
           }
         ]
@@ -102,7 +102,7 @@
     "claude code",
     "claude-code",
     "claude-code-ui",
-    "cloudcli",
+    "orca",
     "codex",
     "gemini",
     "gemini-cli",
@@ -116,7 +116,7 @@
     "ui",
     "mobile IDE"
   ],
-  "author": "CloudCLI UI Contributors",
+  "author": "Orca Contributors",
   "license": "AGPL-3.0-or-later",
   "dependencies": {
     "@anthropic-ai/claude-agent-sdk": "^0.3.165",

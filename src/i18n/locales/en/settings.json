@@ -48,7 +48,8 @@
   "actions": {
     "saveChanges": "Save Changes",
     "resetToDefaults": "Reset to Defaults",
-    "cancelChanges": "Cancel Changes"
+    "cancelChanges": "Cancel Changes",
+    "close": "Close settings"
   },
   "quickSettings": {
     "title": "Quick Settings",
@@ -83,6 +84,8 @@
     "arrowUp": "Arrow Up",
     "arrowDown": "Arrow Down",
     "scrollDown": "Scroll Down",
+    "clipboardUnavailable": "Clipboard access is not available",
+    "clipboardDenied": "Clipboard permission denied",
     "handle": {
       "closePanel": "Close shortcuts panel",
       "openPanel": "Open shortcuts panel"
@@ -102,10 +105,51 @@
     "about": "About"
   },
   "claudeConfig": {
+    "intro": "Manage Claude CLI configuration files on disk — the same paths Claude Code reads locally.",
     "projectLabel": "Project context",
     "globalOnly": "Global only (no project)",
     "projectHelp": "Project-scoped settings use the selected project directory on disk.",
+    "noProjects": "No projects with disk paths yet — showing global Claude configuration only.",
     "loading": "Loading Claude configuration…",
+    "fileLoading": "Loading…",
+    "readFailed": "Failed to read file",
+    "retry": "Retry",
+    "unsavedConfirm": "You have unsaved changes. Discard them?",
+    "saveSuccess": "Saved",
+    "saveFailed": "Save failed",
+    "hooksSaveFailed": "Invalid JSON or save failed",
+    "saving": "Saving…",
+    "saveClaudeMd": "Save CLAUDE.md",
+    "saveHooks": "Save hooks",
+    "saveMemory": "Save memory file",
+    "readOnly": "Read-only",
+    "selectFile": "Select a file to view or edit.",
+    "selectPreview": "Select an entry to preview.",
+    "selectProjectAbove": "Select a project above to edit project, local, and private CLAUDE.md files.",
+    "claudeMdTitle": "CLAUDE.md Editor",
+    "claudeMdDescription": "Edit Claude memory files at each configuration level. Changes are written directly to the files Claude CLI reads.",
+    "claudeMdEmpty": "No CLAUDE.md levels available yet.",
+    "hooksTitle": "Hooks",
+    "hooksDescription": "Edit Claude Code event hooks (PreToolUse, PostToolUse, SessionStart, etc.) in settings.json.",
+    "hooksEmpty": "No hook scopes found. Default user and project hooks will appear after loading.",
+    "newScope": "new",
+    "memoryTitle": "Memory",
+    "memoryDescription": "Browse and edit Claude auto-memory markdown files under ~/.claude.",
+    "memoryEmpty": "No memory files found.",
+    "sections": {
+      "claudeMd": "CLAUDE.md",
+      "hooks": "Hooks",
+      "memory": "Memory",
+      "skills": "Skills",
+      "agents": "Agents",
+      "rules": "Rules"
+    },
+    "levels": {
+      "global": "Global (user)",
+      "project": "Project",
+      "local": "Local",
+      "private": "Private"
+    },
     "skillsTitle": "Skills",
     "skillsDescription": "Read-only view of Claude skills from user, project, and plugin sources.",
     "skillsEmpty": "No skills found.",
@@ -145,6 +189,28 @@
     "darkMode": {
       "label": "Dark Mode",
       "description": "Toggle between light and dark themes"
+    },
+    "colorTheme": {
+      "label": "Color theme",
+      "description": "Choose a preset palette or build your own custom colors",
+      "orca": "Orca",
+      "classic": "Classic",
+      "slate": "Slate",
+      "custom": "Custom",
+      "customDescription": "Pick colors for light and dark mode. Changes apply instantly.",
+      "lightMode": "Light mode",
+      "darkMode": "Dark mode",
+      "resetCustom": "Reset to defaults",
+      "pickColor": "Pick a color",
+      "hexPlaceholder": "#RRGGBB",
+      "colors": {
+        "background": "Background",
+        "foreground": "Text",
+        "primary": "Accent",
+        "card": "Card",
+        "border": "Border",
+        "muted": "Muted"
+      }
     },
     "projectSorting": {
       "label": "Project Sorting",
@@ -470,7 +536,7 @@
     },
     "managed": {
       "badge": "Managed",
-      "hint": "Managed by CloudCLI."
+      "hint": "Managed by Orca."
     },
     "help": {
       "title": "About Codex MCP",
@@ -479,7 +545,7 @@
   },
   "pluginSettings": {
     "title": "Plugins",
-    "description": "Extend the interface with custom plugins. Install from git or drop a folder in ~/.claude-code-ui/plugins/",
+    "description": "Extend the interface with custom plugins. Install from git or drop a folder in ~/.orca/plugins/",
     "installPlaceholder": "https://github.com/user/my-plugin",
     "installButton": "Install",
     "installing": "Installing…",
@@ -502,7 +568,7 @@
     "docs": "Docs",
     "sections": {
       "officialTitle": "Official Plugins",
-      "officialDescription": "Maintained by the CloudCLI team and ready for direct install.",
+      "officialDescription": "Maintained by the Orca team and ready for direct install.",
       "unofficialTitle": "Other Plugins",
       "unofficialDescription": "Unofficial plugins and integrations from other users. Review the source before installing."
     },
@@ -530,10 +596,10 @@
       "description": "Watch long-running Claude Code sessions for hangs and expose process controls.",
       "install": "Install"
     },
-    "prismCloudCLI": {
-      "name": "PRISM CloudCLI",
+    "prismOrca": {
+      "name": "PRISM Orca",
       "badge": "unofficial",
-      "description": "Session intelligence for Claude Code, inside CloudCLI. See why your sessions are burning tokens without leaving the browser.",
+      "description": "Session intelligence for Claude Code, inside Orca. See why your sessions are burning tokens without leaving the browser.",
       "install": "Install"
     },
     "sessionManagerPlugin": {

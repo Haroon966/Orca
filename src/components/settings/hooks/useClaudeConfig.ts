@@ -41,6 +41,8 @@ export function useClaudeConfig(projectPath?: string) {
     setLoading(true);
     setError(null);
 
+    const failures: string[] = [];
+
     try {
       const [
         claudeMdRes,
@@ -65,21 +67,29 @@ export function useClaudeConfig(projectPath?: string) {
       if (claudeMdRes.ok) {
         const data = await claudeMdRes.json();
         setClaudeMdFiles(data.files ?? []);
+      } else {
+        failures.push('CLAUDE.md');
       }
 
       if (hooksRes.ok) {
         const data = await hooksRes.json();
         setHooksScopes(data.scopes ?? []);
+      } else {
+        failures.push('hooks');
       }
 
       if (memoryRes.ok) {
         const data = await memoryRes.json();
         setMemoryFiles(data.files ?? []);
+      } else {
+        failures.push('memory');
       }
 
       if (agentsRes.ok) {
         const data = await agentsRes.json();
         setAgents(data.agents ?? []);
+      } else {
+        failures.push('agents');
       }
 
       if (rulesRes?.ok) {
@@ -87,6 +97,8 @@ export function useClaudeConfig(projectPath?: string) {
         setRules(data.rules ?? []);
       } else if (!projectPath) {
         setRules([]);
+      } else if (rulesRes) {
+        failures.push('rules');
       }
 
       if (skillsRes.ok) {
@@ -100,6 +112,12 @@ export function useClaudeConfig(projectPath?: string) {
             scope: skill.scope,
           })),
         );
+      } else {
+        failures.push('skills');
+      }
+
+      if (failures.length > 0) {
+        setError(`Failed to load: ${failures.join(', ')}`);
       }
     } catch (loadError) {
       console.error('Failed to load Claude config:', loadError);
@@ -159,7 +177,8 @@ export function useClaudeConfig(projectPath?: string) {
     if (!response.ok) {
       throw new Error('Failed to save memory file');
     }
-  }, []);
+    await loadAll();
+  }, [loadAll]);
 
   const readAgentFile = useCallback(async (filePath: string) => {
     const response = await authenticatedFetch(

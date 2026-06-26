@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { Terminal } from '@xterm/xterm';
+import { useToast } from '../../../../shared/view/ui';
 import { sendSocketMessage } from '../../utils/socket';
 
 type Shortcut =
@@ -58,6 +59,7 @@ export default function TerminalShortcutsPanel({
   bottomOffset = 'bottom-0',
 }: TerminalShortcutsPanelProps) {
   const { t } = useTranslation('settings');
+  const { showToast } = useToast();
   const [ctrlActive, setCtrlActive] = useState(false);
   const [altActive, setAltActive] = useState(false);
 
@@ -74,6 +76,7 @@ export default function TerminalShortcutsPanel({
 
   const pasteFromClipboard = useCallback(async () => {
     if (typeof navigator === 'undefined' || !navigator.clipboard?.readText) {
+      showToast(t('terminalShortcuts.clipboardUnavailable', { defaultValue: 'Clipboard access is not available' }), 'error');
       return;
     }
 
@@ -83,9 +86,9 @@ export default function TerminalShortcutsPanel({
         sendInput(text);
       }
     } catch {
-      // Ignore clipboard permission errors.
+      showToast(t('terminalShortcuts.clipboardDenied', { defaultValue: 'Clipboard permission denied' }), 'error');
     }
-  }, [sendInput]);
+  }, [sendInput, showToast, t]);
 
   const handleKeyPress = useCallback(
     (seq: string) => {

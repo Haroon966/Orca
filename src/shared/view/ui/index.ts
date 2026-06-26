@@ -14,5 +14,7 @@ export { Shimmer } from './Shimmer';
 export { default as Tooltip } from './Tooltip';
 export { PromptInput, PromptInputHeader, PromptInputBody, PromptInputTextarea, PromptInputFooter, PromptInputTools, PromptInputButton, PromptInputSubmit } from './PromptInput';
 export { PillBar, Pill } from './PillBar';
+export { ToastProvider, useToast } from './ToastProvider';
+export type { ToastType } from './ToastProvider';
 export { Queue, QueueItem, QueueItemIndicator, QueueItemContent } from './Queue';
 export type { QueueItemStatus } from './Queue';

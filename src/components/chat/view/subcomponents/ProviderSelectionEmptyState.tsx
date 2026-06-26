@@ -23,7 +23,7 @@ import {
   Card,
 } from "../../../../shared/view/ui";
 
-import { CLAUDEUI_ENABLED_PROVIDERS } from "../../../../config/claudeui";
+import { ORCA_ENABLED_PROVIDERS } from "../../../../config/orca";
 
 const PROVIDER_LABELS: Record<LLMProvider, string> = {
   claude: "Anthropic",
@@ -33,7 +33,7 @@ const PROVIDER_LABELS: Record<LLMProvider, string> = {
   opencode: "OpenCode",
 };
 
-const PROVIDER_META: { id: LLMProvider; name: string }[] = CLAUDEUI_ENABLED_PROVIDERS.map((id) => ({
+const PROVIDER_META: { id: LLMProvider; name: string }[] = ORCA_ENABLED_PROVIDERS.map((id) => ({
   id,
   name: PROVIDER_LABELS[id],
 }));
@@ -237,9 +237,11 @@ export default function ProviderSelectionEmptyState({
             </DialogTrigger>
 
             <DialogContent className="max-w-md overflow-hidden p-0">
-              <DialogTitle>Model Selector</DialogTitle>
+              <DialogTitle>{t('providerSelection.modelSelectorTitle', { defaultValue: 'Model Selector' })}</DialogTitle>
               <div className="border-b border-border/60 bg-muted/20 px-4 py-3">
-                <p className="text-sm font-semibold text-foreground">Choose a model</p>
+                <p className="text-sm font-semibold text-foreground">
+                  {t('providerSelection.chooseModel', { defaultValue: 'Choose a model' })}
+                </p>
               </div>
               <Command>
                 <CommandInput

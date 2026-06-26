@@ -1,6 +1,6 @@
 import type { Dispatch, SetStateAction } from 'react';
 
-import type { AppTab, Project, ProjectSession } from '../../../types/app';
+import type { AppTab, PrimaryTab, Project, ProjectSession } from '../../../types/app';
 import type {
   MarkSessionIdle,
   MarkSessionProcessing,
@@ -41,8 +41,10 @@ export type PrdFile = {
 export type MainContentProps = {
   selectedProject: Project | null;
   selectedSession: ProjectSession | null;
-  activeTab: AppTab;
+  activeTab: PrimaryTab;
+  sidePanel: AppTab | null;
   setActiveTab: Dispatch<SetStateAction<AppTab>>;
+  setSidePanel: Dispatch<SetStateAction<AppTab | null>>;
   ws: WebSocket | null;
   sendMessage: (message: unknown) => void;
   isMobile: boolean;
@@ -60,7 +62,8 @@ export type MainContentProps = {
 };
 
 export type MainContentHeaderProps = {
-  activeTab: AppTab;
+  activeTab: PrimaryTab;
+  sidePanel: AppTab | null;
   setActiveTab: Dispatch<SetStateAction<AppTab>>;
   selectedProject: Project;
   selectedSession: ProjectSession | null;

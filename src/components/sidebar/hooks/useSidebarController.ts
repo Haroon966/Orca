@@ -3,6 +3,7 @@ import type { TFunction } from 'i18next';
 
 import { api } from '../../../utils/api';
 import { usePaletteOps } from '../../../contexts/PaletteOpsContext';
+import { useToast } from '../../../shared/view/ui';
 import type { Project, ProjectSession, LLMProvider } from '../../../types/app';
 import type { SessionActivityMap } from '../../../hooks/useSessionProtection';
 import type {
@@ -117,6 +118,7 @@ export function useSidebarController({
   sidebarVisible,
 }: UseSidebarControllerArgs) {
   const paletteOps = usePaletteOps();
+  const { showToast } = useToast();
   const [expandedProjects, setExpandedProjects] = useState<Set<string>>(new Set());
   const [editingProject, setEditingProject] = useState<string | null>(null);
   const [showNewProject, setShowNewProject] = useState(false);
@@ -510,7 +512,7 @@ export function useSidebarController({
           return next;
         });
         console.error('[Sidebar] Failed to toggle project star:', error);
-        alert(t('messages.updateProjectError'));
+        showToast(t('messages.updateProjectError'), 'error');
       }
     };
 
@@ -549,7 +551,7 @@ export function useSidebarController({
       await onLoadMoreSessions(projectId);
     } catch (error) {
       console.error('[Sidebar] Failed to load more sessions:', error);
-      alert(t('messages.refreshError'));
+      showToast(t('messages.refreshError'), 'error');
     } finally {
       setLoadingMoreProjects((previous) => {
         const next = new Set(previous);
@@ -744,11 +746,11 @@ export function useSidebarController({
           status: response.status,
           error: errorText,
         });
-        alert(t('messages.deleteSessionFailed'));
+        showToast(t('messages.deleteSessionFailed'), 'error');
       }
     } catch (error) {
       console.error('[Sidebar] Error deleting session:', error);
-      alert(t('messages.deleteSessionError'));
+      showToast(t('messages.deleteSessionError'), 'error');
     }
   }, [fetchArchivedSessions, onSessionDelete, sessionDeleteConfirmation, t]);
 
@@ -784,11 +786,11 @@ export function useSidebarController({
         const err = data.error;
         const message =
           typeof err === 'string' ? err : err && typeof err === 'object' && err.message ? err.message : t('messages.deleteProjectFailed');
-        alert(message);
+        showToast(message, 'error');
       }
     } catch (error) {
       console.error('Error deleting project:', error);
-      alert(t('messages.deleteProjectError'));
+      showToast(t('messages.deleteProjectError'), 'error');
     } finally {
       setDeletingProjects((prev) => {
         const next = new Set(prev);
@@ -840,7 +842,7 @@ export function useSidebarController({
           status: response.status,
           error: errorText,
         });
-        alert(t('messages.restoreProjectFailed', 'Failed to restore project. Please try again.'));
+        showToast(t('messages.restoreProjectFailed', 'Failed to restore project. Please try again.'), 'error');
         return;
       }
 
@@ -850,7 +852,7 @@ export function useSidebarController({
       ]);
     } catch (error) {
       console.error('[Sidebar] Error restoring project:', error);
-      alert(t('messages.restoreProjectError', 'Error restoring project. Please try again.'));
+      showToast(t('messages.restoreProjectError', 'Error restoring project. Please try again.'), 'error');
     }
   }, [fetchArchivedSessions, onRefresh, t]);
 
@@ -863,7 +865,7 @@ export function useSidebarController({
           status: response.status,
           error: errorText,
         });
-        alert(t('messages.restoreSessionFailed', 'Failed to restore session. Please try again.'));
+        showToast(t('messages.restoreSessionFailed', 'Failed to restore session. Please try again.'), 'error');
         return;
       }
 
@@ -873,7 +875,7 @@ export function useSidebarController({
       ]);
     } catch (error) {
       console.error('[Sidebar] Error restoring session:', error);
-      alert(t('messages.restoreSessionError', 'Error restoring session. Please try again.'));
+      showToast(t('messages.restoreSessionError', 'Error restoring session. Please try again.'), 'error');
     }
   }, [fetchArchivedSessions, onRefresh, t]);
 
@@ -905,11 +907,11 @@ export function useSidebarController({
           await onRefresh();
         } else {
           console.error('[Sidebar] Failed to rename session:', response.status);
-          alert(t('messages.renameSessionFailed'));
+          showToast(t('messages.renameSessionFailed'), 'error');
         }
       } catch (error) {
         console.error('[Sidebar] Error renaming session:', error);
-        alert(t('messages.renameSessionError'));
+        showToast(t('messages.renameSessionError'), 'error');
       } finally {
         setEditingSession(null);
         setEditingSessionName('');

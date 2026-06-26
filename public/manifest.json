@@ -1,11 +1,11 @@
 {
-  "name": "CloudCLI UI",
-  "short_name": "CloudCLI UI",
-  "description": "CloudCLI UI web application",
+  "name": "Orca",
+  "short_name": "Orca",
+  "description": "Orca — intelligent coding interface",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#ffffff",
+  "background_color": "#F0F8FF",
+  "theme_color": "#000814",
   "orientation": "portrait-primary",
   "scope": "/",
   "icons": [

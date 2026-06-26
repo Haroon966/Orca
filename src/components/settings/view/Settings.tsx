@@ -1,4 +1,5 @@
 import { X } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import ProviderLoginModal from '../../provider-auth/view/ProviderLoginModal';
@@ -14,12 +15,15 @@ import TasksSettingsTab from '../view/tabs/tasks-settings/TasksSettingsTab';
 import PluginSettingsTab from '../../plugins/view/PluginSettingsTab';
 import AboutTab from '../view/tabs/AboutTab';
 import ClaudeConfigSettingsTab from '../view/tabs/claude-config/ClaudeConfigSettingsTab';
+import { confirmDiscardUnsavedChanges } from '../hooks/useUnsavedChangesConfirm';
 import { useSettingsController } from '../hooks/useSettingsController';
 import { useWebPush } from '../../../hooks/useWebPush';
 import type { SettingsProps } from '../types/types';
 
 function Settings({ isOpen, onClose, projects = [], initialTab = 'agents' }: SettingsProps) {
   const { t } = useTranslation('settings');
+  const [claudeConfigDirty, setClaudeConfigDirty] = useState(false);
+  const dialogRef = useRef<HTMLDivElement>(null);
   const {
     activeTab,
     setActiveTab,
@@ -75,6 +79,41 @@ function Settings({ isOpen, onClose, projects = [], initialTab = 'agents' }: Set
     });
   };
 
+  const requestClose = useCallback(() => {
+    if (claudeConfigDirty && !confirmDiscardUnsavedChanges(t('claudeConfig.unsavedConfirm', {
+      defaultValue: 'You have unsaved changes. Discard them?',
+    }))) {
+      return;
+    }
+    onClose();
+  }, [claudeConfigDirty, onClose, t]);
+
+  const handleTabChange = useCallback((tab: typeof activeTab) => {
+    if (activeTab === 'claude-config' && claudeConfigDirty && tab !== 'claude-config') {
+      if (!confirmDiscardUnsavedChanges(t('claudeConfig.unsavedConfirm', {
+        defaultValue: 'You have unsaved changes. Discard them?',
+      }))) {
+        return;
+      }
+      setClaudeConfigDirty(false);
+    }
+    setActiveTab(tab);
+  }, [activeTab, claudeConfigDirty, setActiveTab, t]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        requestClose();
+      }
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [isOpen, requestClose]);
+
   if (!isOpen) {
     return null;
   }
@@ -82,11 +121,25 @@ function Settings({ isOpen, onClose, projects = [], initialTab = 'agents' }: Set
   const isAuthenticated = Boolean(loginProvider && providerAuthStatus[loginProvider].authenticated);
 
   return (
-    <div className="modal-backdrop fixed inset-0 z-[9999] flex items-center justify-center bg-background/80 backdrop-blur-sm md:p-4">
-      <div className="flex h-full w-full flex-col overflow-hidden border border-border bg-background shadow-2xl md:h-[90vh] md:max-w-4xl md:rounded-xl">
+    <div
+      className="modal-backdrop fixed inset-0 z-[9999] flex items-center justify-center bg-background/80 backdrop-blur-sm md:p-4"
+      role="presentation"
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) {
+          requestClose();
+        }
+      }}
+    >
+      <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="settings-dialog-title"
+        className="flex h-full w-full flex-col overflow-hidden border border-border bg-background shadow-2xl md:h-[90vh] md:max-w-4xl md:rounded-xl"
+      >
         {/* Header */}
         <div className="flex flex-shrink-0 items-center justify-between border-b border-border px-4 py-3 md:px-5">
-          <h2 className="text-base font-semibold text-foreground">{t('title')}</h2>
+          <h2 id="settings-dialog-title" className="text-base font-semibold text-foreground">{t('title')}</h2>
           <div className="flex items-center gap-2">
             {saveStatus === 'success' && (
               <span className="animate-in fade-in text-xs text-muted-foreground">{t('saveStatus.success')}</span>
@@ -94,7 +147,8 @@ function Settings({ isOpen, onClose, projects = [], initialTab = 'agents' }: Set
             <Button
               variant="ghost"
               size="sm"
-              onClick={onClose}
+              onClick={requestClose}
+              aria-label={t('actions.close', { defaultValue: 'Close settings' })}
               className="h-10 w-10 touch-manipulation p-0 text-muted-foreground hover:text-foreground active:bg-accent/50"
             >
               <X className="h-5 w-5" />
@@ -104,7 +158,7 @@ function Settings({ isOpen, onClose, projects = [], initialTab = 'agents' }: Set
 
         {/* Body: sidebar + content */}
         <div className="flex min-h-0 min-w-0 flex-1 flex-col md:flex-row">
-          <SettingsSidebar activeTab={activeTab} onChange={setActiveTab} />
+          <SettingsSidebar activeTab={activeTab} onChange={handleTabChange} />
 
           {/* Content */}
           <main className="min-w-0 flex-1 overflow-y-auto overflow-x-hidden">
@@ -141,7 +195,10 @@ function Settings({ isOpen, onClose, projects = [], initialTab = 'agents' }: Set
               )}
 
               {activeTab === 'claude-config' && (
-                <ClaudeConfigSettingsTab projects={projects} />
+                <ClaudeConfigSettingsTab
+                  projects={projects}
+                  onDirtyChange={setClaudeConfigDirty}
+                />
               )}
 
               {activeTab === 'tasks' && <TasksSettingsTab />}

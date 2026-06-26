@@ -1,6 +1,5 @@
 // Load environment variables from .env before other imports execute.
 import fs from 'fs';
-import os from 'os';
 import path from 'path';
 import { findAppRoot, getModuleDir } from './utils/runtime-paths.js';
 
@@ -25,9 +24,10 @@ try {
   console.log('No .env file found or error reading it:', e.message);
 }
 
-// Keep the default database in a stable user-level location so rebuilding dist-server
-// never changes where the backend stores auth.db when DATABASE_PATH is not set explicitly.
-const DEFAULT_DATABASE_PATH = path.join(os.homedir(), '.cloudcli', 'auth.db');
+import { DEFAULT_DATABASE_PATH } from './constants/orca.js';
+import { migrateLegacyPaths } from './utils/migrate-legacy-paths.js';
+
+migrateLegacyPaths();
 
 if (!process.env.DATABASE_PATH) {
   process.env.DATABASE_PATH = DEFAULT_DATABASE_PATH;

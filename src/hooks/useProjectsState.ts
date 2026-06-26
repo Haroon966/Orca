@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type SetStateAction } from 'react';
 import type { NavigateFunction } from 'react-router-dom';
 
 import { api } from '../utils/api';
@@ -7,9 +7,11 @@ import type {
   AppTab,
   LLMProvider,
   LoadingProgress,
+  PrimaryTab,
   Project,
   ProjectSession,
 } from '../types/app';
+import { isPrimaryTab, isSidePanelTab } from '../types/app';
 
 import type { SessionActivityMap } from './useSessionProtection';
 
@@ -330,16 +332,31 @@ const isValidTab = (tab: string): tab is AppTab => {
   return VALID_TABS.has(tab) || tab.startsWith('plugin:');
 };
 
-const readPersistedTab = (): AppTab => {
+const readPersistedSidePanel = (): AppTab | null => {
   try {
-    const stored = localStorage.getItem('activeTab');
-    if (stored && isValidTab(stored)) {
-      return stored as AppTab;
+    const stored = localStorage.getItem('sidePanel');
+    if (stored && isValidTab(stored) && isSidePanelTab(stored)) {
+      return stored;
     }
   } catch {
     // localStorage unavailable
   }
-  return 'chat';
+  return null;
+};
+
+const readPersistedTab = (): { activeTab: PrimaryTab; sidePanel: AppTab | null } => {
+  try {
+    const stored = localStorage.getItem('activeTab');
+    if (stored && isValidTab(stored)) {
+      if (isPrimaryTab(stored)) {
+        return { activeTab: stored, sidePanel: readPersistedSidePanel() };
+      }
+      return { activeTab: 'chat', sidePanel: stored };
+    }
+  } catch {
+    // localStorage unavailable
+  }
+  return { activeTab: 'chat', sidePanel: null };
 };
 
 export function useProjectsState({
@@ -352,7 +369,25 @@ export function useProjectsState({
   const [projects, setProjects] = useState<Project[]>([]);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [selectedSession, setSelectedSession] = useState<ProjectSession | null>(null);
-  const [activeTab, setActiveTab] = useState<AppTab>(readPersistedTab);
+  const persisted = readPersistedTab();
+  const [activeTab, setActiveTabState] = useState<PrimaryTab>(persisted.activeTab);
+  const [sidePanel, setSidePanel] = useState<AppTab | null>(persisted.sidePanel);
+
+  const setActiveTab = useCallback((value: SetStateAction<AppTab>) => {
+    setActiveTabState((previousPrimary) => {
+      const resolved =
+        typeof value === 'function'
+          ? value(previousPrimary)
+          : value;
+
+      if (isSidePanelTab(resolved)) {
+        setSidePanel((current) => (current === resolved ? null : resolved));
+        return previousPrimary;
+      }
+
+      return resolved;
+    });
+  }, []);
 
   useEffect(() => {
     try {
@@ -361,6 +396,18 @@ export function useProjectsState({
       // Silently ignore storage errors
     }
   }, [activeTab]);
+
+  useEffect(() => {
+    try {
+      if (sidePanel) {
+        localStorage.setItem('sidePanel', sidePanel);
+      } else {
+        localStorage.removeItem('sidePanel');
+      }
+    } catch {
+      // Silently ignore storage errors
+    }
+  }, [sidePanel]);
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isLoadingProjects, setIsLoadingProjects] = useState(true);
@@ -776,8 +823,8 @@ export function useProjectsState({
     (session: ProjectSession) => {
       setSelectedSession(session);
 
-      if (activeTab === 'tasks' || activeTab === 'browser') {
-        setActiveTab('chat');
+      if (sidePanel === 'tasks' || sidePanel === 'browser') {
+        setSidePanel(null);
       }
 
       if (isMobile) {
@@ -795,7 +842,7 @@ export function useProjectsState({
 
       navigate(`/session/${session.id}`);
     },
-    [activeTab, isMobile, navigate, selectedProject?.projectId],
+    [isMobile, navigate, selectedProject?.projectId, sidePanel],
   );
 
   const handleNewSession = useCallback(
@@ -985,6 +1032,7 @@ export function useProjectsState({
     selectedProject,
     selectedSession,
     activeTab,
+    sidePanel,
     sidebarOpen,
     isLoadingProjects,
     loadingProgress,
@@ -994,6 +1042,7 @@ export function useProjectsState({
     externalMessageUpdate,
     newSessionTrigger,
     setActiveTab,
+    setSidePanel,
     setSidebarOpen,
     setIsInputFocused,
     setShowSettings,

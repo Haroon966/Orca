@@ -19,6 +19,16 @@ export type ProviderModelsCacheInfo = {
 
 export type AppTab = 'chat' | 'files' | 'shell' | 'git' | 'tasks' | 'browser' | `plugin:${string}`;
 
+export type PrimaryTab = 'chat' | 'shell';
+
+export type SidePanelTab = Exclude<AppTab, PrimaryTab>;
+
+const PRIMARY_TAB_SET = new Set<AppTab>(['chat', 'shell']);
+
+export const isPrimaryTab = (tab: AppTab): tab is PrimaryTab => PRIMARY_TAB_SET.has(tab);
+
+export const isSidePanelTab = (tab: AppTab): tab is SidePanelTab => !PRIMARY_TAB_SET.has(tab);
+
 export interface ProjectSession {
   id: string;
   title?: string;

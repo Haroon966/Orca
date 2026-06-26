@@ -95,9 +95,8 @@ sudo systemctl enable --now claudeui
 ### Remote / LAN access
 
 1. Set `HOST=0.0.0.0` in `.env` to bind all interfaces.
-2. **Enable authentication** — register a user on first launch; all API routes require JWT.
-3. Put **HTTPS** in front (Caddy or nginx reverse proxy).
-4. Do not expose an unauthenticated instance to the internet.
+2. Put **HTTPS** in front (Caddy or nginx reverse proxy).
+3. ClaudeUI has no app login — restrict network access via firewall or bind to `127.0.0.1` unless you add your own reverse-proxy auth.
 
 ### Environment variables
 
@@ -107,10 +106,9 @@ sudo systemctl enable --now claudeui
 | `SERVER_PORT` | `3001` | API + production frontend port |
 | `VITE_PORT` | `5173` | Dev frontend port |
 | `CLAUDE_CLI_PATH` | `claude` | Path to Claude CLI binary |
-| `DISABLE_AUTH` | `false` | Skip login/JWT on server (`true` for local no-login) |
-| `VITE_DISABLE_AUTH` | `false` | Skip login UI in browser (must match `DISABLE_AUTH`) |
-| `JWT_SECRET` | auto-generated | Auth token signing secret |
 | `API_KEY` | — | Optional API key for all `/api` routes |
+
+Authentication is **Claude CLI only** (`claude login` or API key in `~/.claude`). There is no separate app login.
 
 ## Upstream sync
 

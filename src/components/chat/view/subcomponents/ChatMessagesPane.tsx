@@ -197,9 +197,17 @@ export default function ChatMessagesPane({
           {hasMoreMessages && !isLoadingMoreMessages && !allMessagesLoaded && (
             <div className="border-b border-gray-200 py-2 text-center text-sm text-gray-500 dark:border-gray-700 dark:text-gray-400">
               {totalMessages > 0 && (
-                <span>
-                  {t('session.messages.showingOf', { shown: sessionMessagesCount, total: totalMessages })}{' '}
-                  <span className="text-xs">{t('session.messages.scrollToLoad')}</span>
+                <span className="flex flex-col items-center gap-2">
+                  <span>
+                    {t('session.messages.showingOf', { shown: sessionMessagesCount, total: totalMessages })}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={loadEarlierMessages}
+                    className="rounded-full bg-blue-600 px-4 py-1.5 text-xs font-medium text-white transition-colors hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+                  >
+                    {t('session.messages.loadEarlier', { defaultValue: 'Load earlier messages' })}
+                  </button>
                 </span>
               )}
             </div>

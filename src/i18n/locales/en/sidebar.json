@@ -20,8 +20,8 @@
     "runClaudeCli": "Run Claude CLI in a project directory to get started"
   },
   "app": {
-    "title": "CloudCLI",
-    "subtitle": "AI coding assistant interface"
+    "title": "Orca",
+    "subtitle": "Intelligent coding interface"
   },
   "sessions": {
     "title": "Sessions",

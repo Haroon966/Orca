@@ -15,14 +15,6 @@ export interface FileTreeNode {
   [key: string]: unknown;
 }
 
-export interface FileTreeImageSelection {
-  name: string;
-  path: string;
-  projectPath?: string;
-  // DB projectId; used by ImageViewer to build the raw content URL.
-  projectId: string;
-}
-
 export interface FileIconData {
   icon: LucideIcon;
   color: string;

@@ -3,6 +3,7 @@ import { I18nextProvider } from 'react-i18next';
 
 import { ThemeProvider } from './contexts/ThemeContext';
 import { AuthProvider, ProtectedRoute } from './components/auth';
+import { ToastProvider } from './shared/view/ui';
 import { TaskMasterProvider } from './contexts/TaskMasterContext';
 import { TasksSettingsProvider } from './contexts/TasksSettingsContext';
 import { WebSocketProvider } from './contexts/WebSocketContext';
@@ -15,7 +16,7 @@ const DEPLOYMENT_ASSET_DIRECTORIES = new Set(['assets', 'static', 'icons', 'imag
 /**
  * Detect the router basename from explicit runtime config or deployment hints.
  *
- * CloudCLI can be served from a path prefix by a reverse proxy, for example:
+ * Orca can be served from a path prefix by a reverse proxy, for example:
  *   /ai/manifest.json
  *   /ai/assets/index-abc123.js
  *   /ai/icons/icon-192x192.png
@@ -107,6 +108,7 @@ export default function App() {
     <I18nextProvider i18n={i18n}>
       <ThemeProvider>
         <AuthProvider>
+          <ToastProvider>
           <WebSocketProvider>
             <PluginsProvider>
               <TasksSettingsProvider>
@@ -123,6 +125,7 @@ export default function App() {
               </TasksSettingsProvider>
             </PluginsProvider>
           </WebSocketProvider>
+          </ToastProvider>
         </AuthProvider>
       </ThemeProvider>
     </I18nextProvider>

@@ -64,11 +64,13 @@ function AppContentInner() {
     selectedProject,
     selectedSession,
     activeTab,
+    sidePanel,
     sidebarOpen,
     isLoadingProjects,
     externalMessageUpdate,
     newSessionTrigger,
     setActiveTab,
+    setSidePanel,
     setSidebarOpen,
     setIsInputFocused,
     openSettings,
@@ -230,7 +232,9 @@ function AppContentInner() {
           selectedProject={selectedProject}
           selectedSession={selectedSession}
           activeTab={activeTab}
+          sidePanel={sidePanel}
           setActiveTab={setActiveTab}
+          setSidePanel={setSidePanel}
           ws={ws}
           sendMessage={sendMessage}
           isMobile={isMobile}

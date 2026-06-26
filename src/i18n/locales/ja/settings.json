@@ -128,6 +128,28 @@
       "label": "ダークモード",
       "description": "ライトテーマとダークテーマを切り替えます"
     },
+    "colorTheme": {
+      "label": "カラーテーマ",
+      "description": "プリセットまたはカスタムカラーを選択",
+      "orca": "Orca",
+      "classic": "クラシック",
+      "slate": "スレート",
+      "custom": "カスタム",
+      "customDescription": "ライト/ダークモードの色を設定。変更はすぐに反映されます。",
+      "lightMode": "ライトモード",
+      "darkMode": "ダークモード",
+      "resetCustom": "デフォルトに戻す",
+      "pickColor": "色を選択",
+      "hexPlaceholder": "#RRGGBB",
+      "colors": {
+        "background": "背景",
+        "foreground": "テキスト",
+        "primary": "アクセント",
+        "card": "カード",
+        "border": "枠線",
+        "muted": "ミュート"
+      }
+    },
     "projectSorting": {
       "label": "プロジェクトの並び順",
       "description": "サイドバーでのプロジェクトの並び順を設定します",
@@ -453,7 +475,7 @@
   },
   "pluginSettings": {
     "title": "プラグイン",
-    "description": "カスタムプラグインでインターフェースを拡張します。gitからインストールするか、~/.claude-code-ui/plugins/ にフォルダを配置してください。",
+    "description": "カスタムプラグインでインターフェースを拡張します。gitからインストールするか、~/.orca/plugins/ にフォルダを配置してください。",
     "installPlaceholder": "https://github.com/user/my-plugin",
     "installButton": "インストール",
     "installing": "インストール中…",
