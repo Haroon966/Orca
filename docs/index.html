@@ -1,0 +1,515 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Download Orca — Desktop app for Claude Code</title>
+    <meta
+      name="description"
+      content="Download Orca for Windows, Linux, and macOS. A polished desktop IDE for Claude Code CLI with in-app updates."
+    />
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <meta name="theme-color" content="#000814" />
+    <style>
+      :root {
+        --bg: #000814;
+        --bg-soft: #001d3d;
+        --surface: rgba(0, 53, 102, 0.35);
+        --border: rgba(202, 240, 248, 0.14);
+        --text: #f0f8ff;
+        --muted: #90e0ef;
+        --accent: #0077b6;
+        --accent-bright: #48cae4;
+        --ice: #caf0f8;
+        --success: #2dd4bf;
+        --shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family:
+          Inter,
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          Segoe UI,
+          Roboto,
+          Helvetica,
+          Arial,
+          sans-serif;
+        color: var(--text);
+        background:
+          radial-gradient(circle at top, rgba(0, 119, 182, 0.35), transparent 42%),
+          radial-gradient(circle at 80% 20%, rgba(72, 202, 228, 0.12), transparent 30%),
+          linear-gradient(180deg, var(--bg) 0%, #001233 100%);
+      }
+
+      a {
+        color: inherit;
+      }
+
+      .wrap {
+        width: min(920px, calc(100% - 2rem));
+        margin: 0 auto;
+        padding: 3rem 0 4rem;
+      }
+
+      header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 2.5rem;
+      }
+
+      .logo {
+        width: 3rem;
+        height: 3rem;
+        border-radius: 0.9rem;
+        box-shadow: var(--shadow);
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(2rem, 5vw, 2.75rem);
+        letter-spacing: -0.03em;
+      }
+
+      .tagline {
+        margin: 0.35rem 0 0;
+        color: var(--muted);
+        font-size: 1.05rem;
+      }
+
+      .hero-card,
+      .platform-card {
+        border: 1px solid var(--border);
+        background: var(--surface);
+        backdrop-filter: blur(12px);
+        border-radius: 1.25rem;
+        box-shadow: var(--shadow);
+      }
+
+      .hero-card {
+        padding: 1.5rem;
+        margin-bottom: 1.25rem;
+      }
+
+      .hero-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        padding: 0.35rem 0.75rem;
+        border-radius: 999px;
+        background: rgba(72, 202, 228, 0.12);
+        color: var(--ice);
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+      }
+
+      .hero-title {
+        margin: 0 0 0.35rem;
+        font-size: 1.35rem;
+      }
+
+      .hero-sub {
+        margin: 0 0 1.25rem;
+        color: var(--muted);
+        line-height: 1.5;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.55rem;
+        min-height: 3rem;
+        padding: 0.85rem 1.25rem;
+        border-radius: 0.9rem;
+        border: 1px solid transparent;
+        font-size: 1rem;
+        font-weight: 600;
+        text-decoration: none;
+        cursor: pointer;
+        transition:
+          transform 0.15s ease,
+          background 0.15s ease,
+          border-color 0.15s ease;
+      }
+
+      .btn:hover {
+        transform: translateY(-1px);
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, var(--accent), var(--accent-bright));
+        color: var(--bg);
+      }
+
+      .btn-secondary {
+        background: rgba(255, 255, 255, 0.04);
+        border-color: var(--border);
+        color: var(--text);
+      }
+
+      .btn[disabled],
+      .btn.disabled {
+        opacity: 0.55;
+        pointer-events: none;
+        cursor: not-allowed;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 1rem;
+      }
+
+      .platform-card {
+        padding: 1.25rem;
+      }
+
+      .platform-card.recommended {
+        border-color: rgba(72, 202, 228, 0.45);
+        box-shadow:
+          0 0 0 1px rgba(72, 202, 228, 0.15),
+          var(--shadow);
+      }
+
+      .platform-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        margin-bottom: 0.75rem;
+      }
+
+      .platform-name {
+        margin: 0;
+        font-size: 1.05rem;
+      }
+
+      .badge {
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        padding: 0.25rem 0.5rem;
+        border-radius: 999px;
+        background: rgba(45, 212, 191, 0.15);
+        color: var(--success);
+      }
+
+      .platform-copy {
+        margin: 0 0 1rem;
+        color: var(--muted);
+        font-size: 0.92rem;
+        line-height: 1.45;
+        min-height: 2.9rem;
+      }
+
+      .stack {
+        display: grid;
+        gap: 0.65rem;
+      }
+
+      .meta {
+        margin-top: 1.5rem;
+        color: var(--muted);
+        font-size: 0.92rem;
+        line-height: 1.6;
+      }
+
+      .meta strong {
+        color: var(--ice);
+      }
+
+      .links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-top: 0.75rem;
+      }
+
+      .links a {
+        color: var(--accent-bright);
+      }
+
+      .status {
+        margin-top: 1rem;
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+
+      .error {
+        color: #fca5a5;
+      }
+
+      footer {
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--border);
+        color: var(--muted);
+        font-size: 0.85rem;
+      }
+
+      @media (max-width: 640px) {
+        .wrap {
+          padding-top: 2rem;
+        }
+
+        header {
+          align-items: flex-start;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <img class="logo" src="favicon.svg" alt="" width="48" height="48" />
+        <div>
+          <h1>Orca</h1>
+          <p class="tagline">Desktop IDE for Claude Code CLI</p>
+        </div>
+      </header>
+
+      <section class="hero-card" id="hero">
+        <div class="hero-label" id="hero-label">Checking latest release…</div>
+        <h2 class="hero-title" id="hero-title">Download Orca</h2>
+        <p class="hero-sub" id="hero-sub">
+          One-click installers for Windows, Linux, and macOS. Updates install in-app — no uninstall required.
+        </p>
+        <a class="btn btn-primary disabled" id="hero-download" href="#" aria-disabled="true">Loading download…</a>
+      </section>
+
+      <div class="grid" id="platform-grid">
+        <article class="platform-card" data-platform="windows">
+          <div class="platform-head">
+            <h3 class="platform-name">Windows</h3>
+          </div>
+          <p class="platform-copy">Installer for Windows 10/11 (x64).</p>
+          <div class="stack">
+            <a class="btn btn-secondary disabled" data-kind="exe" href="#" aria-disabled="true">Download .exe</a>
+          </div>
+        </article>
+
+        <article class="platform-card" data-platform="linux">
+          <div class="platform-head">
+            <h3 class="platform-name">Linux</h3>
+          </div>
+          <p class="platform-copy">AppImage for portable use, or .deb for Ubuntu/Debian.</p>
+          <div class="stack">
+            <a class="btn btn-secondary disabled" data-kind="appimage" href="#" aria-disabled="true">Download AppImage</a>
+            <a class="btn btn-secondary disabled" data-kind="deb" href="#" aria-disabled="true">Download .deb</a>
+          </div>
+        </article>
+
+        <article class="platform-card" data-platform="mac">
+          <div class="platform-head">
+            <h3 class="platform-name">macOS</h3>
+          </div>
+          <p class="platform-copy">Apple Silicon builds (.dmg or .zip).</p>
+          <div class="stack">
+            <a class="btn btn-secondary disabled" data-kind="dmg" href="#" aria-disabled="true">Download .dmg</a>
+            <a class="btn btn-secondary disabled" data-kind="zip" href="#" aria-disabled="true">Download .zip</a>
+          </div>
+        </article>
+      </div>
+
+      <p class="meta" id="release-meta"></p>
+
+      <p class="status" id="status"></p>
+
+      <div class="links">
+        <a href="https://github.com/Haroon966/Orca/releases/latest">All releases</a>
+        <a href="https://github.com/Haroon966/Orca">GitHub repo</a>
+        <a href="https://www.npmjs.com/package/@orca-ai/orca">npm install</a>
+      </div>
+
+      <footer>
+        Free &amp; open source · AGPL-3.0 · Built for Claude Code
+      </footer>
+    </div>
+
+    <script>
+      const REPO = 'Haroon966/Orca';
+      const API = `https://api.github.com/repos/${REPO}/releases/latest`;
+
+      const heroLabel = document.getElementById('hero-label');
+      const heroTitle = document.getElementById('hero-title');
+      const heroSub = document.getElementById('hero-sub');
+      const heroDownload = document.getElementById('hero-download');
+      const releaseMeta = document.getElementById('release-meta');
+      const statusEl = document.getElementById('status');
+
+      function detectPlatform() {
+        const ua = navigator.userAgent.toLowerCase();
+        const platform = navigator.platform?.toLowerCase() || '';
+
+        if (/win/.test(platform) || ua.includes('windows')) return 'windows';
+        if (/mac/.test(platform) || ua.includes('mac os')) return 'mac';
+        if (/linux/.test(platform) || ua.includes('linux') || ua.includes('x11')) return 'linux';
+        return 'unknown';
+      }
+
+      function pickAsset(assets, pattern) {
+        return assets.find((asset) => pattern.test(asset.name));
+      }
+
+      function enableLink(link, asset) {
+        link.href = asset.browser_download_url;
+        link.textContent = link.dataset.label || link.textContent;
+        link.setAttribute('download', asset.name);
+        link.classList.remove('disabled');
+        link.removeAttribute('aria-disabled');
+      }
+
+      function disableLink(link, label) {
+        link.href = '#';
+        link.textContent = label;
+        link.classList.add('disabled');
+        link.setAttribute('aria-disabled', 'true');
+      }
+
+      function formatBytes(bytes) {
+        if (!bytes) return '';
+        const units = ['B', 'KB', 'MB', 'GB'];
+        let size = bytes;
+        let unit = 0;
+        while (size >= 1024 && unit < units.length - 1) {
+          size /= 1024;
+          unit += 1;
+        }
+        return `${size.toFixed(size >= 10 || unit === 0 ? 0 : 1)} ${units[unit]}`;
+      }
+
+      function setRecommendedCard(platform) {
+        document.querySelectorAll('.platform-card').forEach((card) => {
+          const isMatch = card.dataset.platform === platform;
+          card.classList.toggle('recommended', isMatch);
+          const badge = card.querySelector('.badge');
+          if (isMatch && !badge) {
+            const el = document.createElement('span');
+            el.className = 'badge';
+            el.textContent = 'Recommended';
+            card.querySelector('.platform-head').appendChild(el);
+          }
+        });
+      }
+
+      function configureHero(platform, assets, version) {
+        const picks = {
+          windows: pickAsset(assets, /\.exe$/i),
+          linux: pickAsset(assets, /\.AppImage$/i),
+          mac: pickAsset(assets, /\.dmg$/i) || pickAsset(assets, /\.zip$/i),
+        };
+
+        const asset = picks[platform] || pickAsset(assets, /\.exe$/i) || assets[0];
+        const labels = {
+          windows: 'Download for Windows',
+          linux: 'Download for Linux',
+          mac: 'Download for macOS',
+          unknown: 'Download latest release',
+        };
+
+        heroLabel.textContent = `Latest release · v${version}`;
+        heroTitle.textContent = labels[platform] || labels.unknown;
+
+        if (platform === 'linux') {
+          heroSub.textContent =
+            'AppImage is recommended for one-click in-app updates. .deb is also available below.';
+        } else if (platform === 'windows') {
+          heroSub.textContent =
+            'Run the installer, then launch Orca from the Start menu. Future updates install in-app.';
+        } else if (platform === 'mac') {
+          heroSub.textContent =
+            'Open the .dmg and drag Orca to Applications. Future updates install in-app.';
+        }
+
+        if (asset) {
+          enableLink(heroDownload, asset);
+          heroDownload.textContent = `${labels[platform] || 'Download'} (${asset.name.replace(/^Orca-/, '')})`;
+        } else {
+          disableLink(heroDownload, 'No installer found');
+        }
+
+        if (platform !== 'unknown') {
+          setRecommendedCard(platform);
+        }
+      }
+
+      async function loadRelease() {
+        try {
+          const response = await fetch(API, {
+            headers: { Accept: 'application/vnd.github+json' },
+          });
+
+          if (!response.ok) {
+            throw new Error(`GitHub API returned ${response.status}`);
+          }
+
+          const release = await response.json();
+          const assets = release.assets || [];
+          const version = (release.tag_name || '').replace(/^v/, '');
+          const platform = detectPlatform();
+
+          const mappings = [
+            { selector: '[data-platform="windows"] [data-kind="exe"]', pattern: /\.exe$/i, label: 'Download .exe' },
+            {
+              selector: '[data-platform="linux"] [data-kind="appimage"]',
+              pattern: /\.AppImage$/i,
+              label: 'Download AppImage',
+            },
+            { selector: '[data-platform="linux"] [data-kind="deb"]', pattern: /\.deb$/i, label: 'Download .deb' },
+            { selector: '[data-platform="mac"] [data-kind="dmg"]', pattern: /\.dmg$/i, label: 'Download .dmg' },
+            { selector: '[data-platform="mac"] [data-kind="zip"]', pattern: /\.zip$/i, label: 'Download .zip' },
+          ];
+
+          mappings.forEach(({ selector, pattern, label }) => {
+            const link = document.querySelector(selector);
+            if (!link) return;
+            link.dataset.label = label;
+            const asset = pickAsset(assets, pattern);
+            if (asset) {
+              enableLink(link, asset);
+              link.textContent = `${label} · ${formatBytes(asset.size)}`;
+            } else {
+              disableLink(link, `${label} (unavailable)`);
+            }
+          });
+
+          configureHero(platform, assets, version);
+
+          const published = release.published_at
+            ? new Date(release.published_at).toLocaleDateString(undefined, {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+              })
+            : '';
+
+          releaseMeta.innerHTML = published
+            ? `<strong>v${version}</strong> published ${published}. Links download directly from GitHub Releases.`
+            : `<strong>v${version}</strong> — links download directly from GitHub Releases.`;
+        } catch (error) {
+          heroLabel.textContent = 'Could not load latest release';
+          heroTitle.textContent = 'Download from GitHub Releases';
+          heroSub.textContent = 'Automatic links failed to load. Use the release page to download manually.';
+          heroDownload.href = `https://github.com/${REPO}/releases/latest`;
+          heroDownload.textContent = 'Open GitHub Releases';
+          heroDownload.classList.remove('disabled');
+          heroDownload.removeAttribute('aria-disabled');
+          statusEl.innerHTML = `<span class="error">${error.message}</span>`;
+        }
+      }
+
+      loadRelease();
+    </script>
+  </body>
+</html>
