@@ -1,5 +1,5 @@
 {
-  "name": "@orca-ai/orca",
+  "name": "@orca_ai/orca",
   "version": "1.34.4",
   "productName": "Orca",
   "description": "Orca — intelligent coding interface for Claude Code CLI",
@@ -50,7 +50,7 @@
     "lint:fix": "eslint src/ server/ --fix",
     "start": "npm run build && npm run server",
     "release": "./release.sh",
-    "publish:npm": "npm publish --access public",
+    "publish:npm": "./scripts/publish-npm.sh",
     "prepublishOnly": "npm run build",
     "postinstall": "node scripts/fix-node-pty.js",
     "prepare": "husky",

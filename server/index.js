@@ -275,7 +275,7 @@ app.post('/api/system/update', authenticateToken, async (req, res) => {
             ? 'npm run update:platform'
             : installMode === 'git'
                 ? 'git checkout main && git pull && npm install'
-                : 'npm install -g @orca-ai/orca@latest';
+                : 'npm install -g @orca_ai/orca@latest';
 
         const updateCwd = IS_PLATFORM || installMode === 'git'
             ? projectRoot

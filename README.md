@@ -11,7 +11,7 @@ Refined UI/UX · Navy + ice theming · Deep appearance customization · Local-fi
 [![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL--3.0-blue.svg)](LICENSE)
 [![Node.js](https://img.shields.io/badge/Node.js-22%2B-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
 [![GitHub](https://img.shields.io/badge/GitHub-Haroon966%2FOrca-181717?logo=github)](https://github.com/Haroon966/Orca)
-[![npm](https://img.shields.io/badge/npm-@orca--ai%2Forca-CB3837?logo=npm&logoColor=white)](https://www.npmjs.com/package/@orca-ai/orca)
+[![npm](https://img.shields.io/badge/npm-@orca__ai%2Forca-CB3837?logo=npm&logoColor=white)](https://www.npmjs.com/package/@orca_ai/orca)
 [![Fork of CloudCLI UI](https://img.shields.io/badge/Fork-CloudCLI%20UI-0077B6)](https://github.com/siteboon/claudecodeui)
 
 <br />
@@ -188,7 +188,7 @@ Launch **Orca** from your applications menu. To upgrade later, install the new `
 If you already have [Node.js 22+](https://nodejs.org/):
 
 ```bash
-npm install -g @orca-ai/orca
+npm install -g @orca_ai/orca
 orca
 ```
 
@@ -204,7 +204,7 @@ npm run server
 Or install globally:
 
 ```bash
-npm install -g @orca-ai/orca
+npm install -g @orca_ai/orca
 orca
 ```
 
@@ -294,7 +294,7 @@ No uninstall or manual reinstall is required on supported platforms. This is fre
 
 > Auto-update only works in **packaged** desktop installs (`.exe`, AppImage, etc.), not in `npm run dev` or `desktop:dev`.
 
-Web and npm installs continue to use the existing update notification flow (`npm install -g @orca-ai/orca@latest` or git pull).
+Web and npm installs continue to use the existing update notification flow (`npm install -g @orca_ai/orca@latest` or git pull).
 
 ### Publishing (maintainers)
 

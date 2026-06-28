@@ -244,7 +244,7 @@
     "viewFullRelease": "Voir les notes de version complètes",
     "updateProgress": "Progression de la mise à jour :",
     "manualUpgrade": "Mise à jour manuelle :",
-    "npmUpgradeCommand": "npm install -g @orca-ai/orca@latest",
+    "npmUpgradeCommand": "npm install -g @orca_ai/orca@latest",
     "manualUpgradeHint": "Ou cliquez sur « Mettre à jour maintenant » pour lancer la mise à jour automatiquement.",
     "updateCompleted": "Mise à jour effectuée avec succès !",
     "restartServer": "Veuillez redémarrer le serveur pour appliquer les modifications.",

@@ -2,7 +2,7 @@ import os from 'os';
 import path from 'path';
 
 export const ORCA_PRODUCT_NAME = 'Orca';
-export const ORCA_NPM_PACKAGE = '@orca-ai/orca';
+export const ORCA_NPM_PACKAGE = '@orca_ai/orca';
 export const ORCA_CLI_BIN = 'orca';
 export const ORCA_DATA_DIR = '.orca';
 export const ORCA_MCP_BROWSER = 'orca-browser';

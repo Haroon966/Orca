@@ -245,7 +245,7 @@
     "viewFullRelease": "View full release",
     "updateProgress": "Update Progress:",
     "manualUpgrade": "Manual upgrade:",
-    "npmUpgradeCommand": "npm install -g @orca-ai/orca@latest",
+    "npmUpgradeCommand": "npm install -g @orca_ai/orca@latest",
     "manualUpgradeHint": "Or click \"Update Now\" to run the update automatically.",
     "desktopDownloadProgress": "Downloaded {{percent}}%",
     "desktopRestartToInstall": "Version {{version}} is ready. Restart Orca to finish installing.",

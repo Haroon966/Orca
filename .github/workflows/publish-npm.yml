@@ -1,0 +1,39 @@
+name: Publish npm
+
+# Publishes @orca_ai/orca via npm Trusted Publishing (OIDC) — no NPM_TOKEN needed.
+# One-time setup on npmjs.com (after first publish exists, or when claiming the package):
+#   Package → Settings → Trusted Publisher → GitHub Actions
+#   User/org: Haroon966 · Repo: Orca · Workflow: publish-npm.yml
+#
+# First publish: use `npm run publish:npm` locally with a granular token that includes
+# org "orca_ai" (Read and write) + Bypass 2FA, or publish once with --otp=XXXXXX.
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
+      - name: Use npm 11+ for OIDC trusted publishing
+        run: npm install -g npm@latest
+
+      - run: npm ci
+
+      - run: npm run build
+
+      - name: Publish to npm (OIDC — no NPM_TOKEN)
+        run: npm publish --access public

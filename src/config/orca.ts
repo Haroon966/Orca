@@ -2,7 +2,7 @@ import type { LLMProvider } from '../types/app';
 
 export const ORCA_PRODUCT_NAME = 'Orca';
 export const ORCA_TAGLINE = 'Intelligent coding interface';
-export const ORCA_NPM_PACKAGE = '@orca-ai/orca';
+export const ORCA_NPM_PACKAGE = '@orca_ai/orca';
 export const ORCA_CLI_BIN = 'orca';
 export const ORCA_DATA_DIR = '.orca';
 export const ORCA_DEFAULT_COLOR_THEME = 'orca';
