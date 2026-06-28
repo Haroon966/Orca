@@ -122,9 +122,7 @@
       "category": "Development",
       "icon": "build/icons",
       "maintainer": "Orca Contributors",
-      "executableName": "orca",
-      "desktopName": "Orca",
-      "syncDesktopName": true
+      "executableName": "orca"
     },
     "publish": {
       "provider": "github",
