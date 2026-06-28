@@ -10,12 +10,13 @@ Refined UI/UX · Navy + ice theming · Deep appearance customization · Local-fi
 
 [![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL--3.0-blue.svg)](LICENSE)
 [![Node.js](https://img.shields.io/badge/Node.js-22%2B-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
+[![GitHub](https://img.shields.io/badge/GitHub-Haroon966%2FOrca-181717?logo=github)](https://github.com/Haroon966/Orca)
 [![npm](https://img.shields.io/badge/npm-@orca--ai%2Forca-CB3837?logo=npm&logoColor=white)](https://www.npmjs.com/package/@orca-ai/orca)
 [![Fork of CloudCLI UI](https://img.shields.io/badge/Fork-CloudCLI%20UI-0077B6)](https://github.com/siteboon/claudecodeui)
 
 <br />
 
-[Quick start](#quick-start) · [Features](#features) · [Why Orca?](#why-orca) · [Configuration](#configuration) · [License](#license)
+[Quick start](#quick-start) · [Features](#features) · [Why Orca?](#why-orca) · [Configuration](#configuration) · [Issues](https://github.com/Haroon966/Orca/issues) · [License](#license)
 
 <br />
 
@@ -135,8 +136,8 @@ It inherits the same browser-based IDE foundation — chat, terminal, files, git
 **Requirements:** [Node.js 22+](https://nodejs.org/) · [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code) installed and authenticated
 
 ```bash
-git clone https://github.com/YOUR_USER/orca.git
-cd orca
+git clone https://github.com/Haroon966/Orca.git
+cd Orca
 npm install
 npm run dev
 ```
@@ -193,8 +194,8 @@ VITE_DISABLE_AUTH=false
 <br />
 
 ```env
-VITE_GITHUB_OWNER=your-username
-VITE_GITHUB_REPO=orca
+VITE_GITHUB_OWNER=Haroon966
+VITE_GITHUB_REPO=Orca
 ```
 
 </details>

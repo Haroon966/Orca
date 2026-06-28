@@ -183,10 +183,10 @@ Environment Variables:
   CONTEXT_WINDOW      Set context window size (default: 160000)
 
 Documentation:
-  ${packageJson.homepage || 'https://github.com/YOUR_USER/orca'}
+  ${packageJson.homepage || 'https://github.com/Haroon966/Orca'}
 
 Report Issues:
-  ${packageJson.bugs?.url || 'https://github.com/YOUR_USER/orca/issues'}
+  ${packageJson.bugs?.url || 'https://github.com/Haroon966/Orca/issues'}
 `);
 }
 

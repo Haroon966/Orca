@@ -8,8 +8,8 @@ export const ORCA_DATA_DIR = '.orca';
 export const ORCA_DEFAULT_COLOR_THEME = 'orca';
 
 export const ORCA_GITHUB = {
-  owner: import.meta.env.VITE_GITHUB_OWNER ?? 'YOUR_USER',
-  repo: import.meta.env.VITE_GITHUB_REPO ?? 'orca',
+  owner: import.meta.env.VITE_GITHUB_OWNER ?? 'Haroon966',
+  repo: import.meta.env.VITE_GITHUB_REPO ?? 'Orca',
 };
 
 export const ORCA_GITHUB_URL = `https://github.com/${ORCA_GITHUB.owner}/${ORCA_GITHUB.repo}`;

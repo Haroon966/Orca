@@ -661,7 +661,7 @@ export default function PluginSettingsTab() {
         </a>
         <span className="text-muted-foreground/20">·</span>
         <a
-          href="https://github.com/YOUR_USER/orca#plugins"
+          href="https://github.com/Haroon966/Orca#plugins"
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-1 text-xs text-muted-foreground/60 transition-colors hover:text-foreground"

@@ -18,13 +18,13 @@
     "scripts/",
     "README.md"
   ],
-  "homepage": "https://github.com/YOUR_USER/orca",
+  "homepage": "https://github.com/Haroon966/Orca",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/YOUR_USER/orca.git"
+    "url": "git+https://github.com/Haroon966/Orca.git"
   },
   "bugs": {
-    "url": "https://github.com/YOUR_USER/orca/issues"
+    "url": "https://github.com/Haroon966/Orca/issues"
   },
   "scripts": {
     "dev": "concurrently --kill-others \"npm run server:dev\" \"npm run client\"",
