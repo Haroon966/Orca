@@ -50,6 +50,7 @@
     "lint:fix": "eslint src/ server/ --fix",
     "start": "npm run build && npm run server",
     "release": "./release.sh",
+    "publish:npm": "npm publish --access public",
     "prepublishOnly": "npm run build",
     "postinstall": "node scripts/fix-node-pty.js",
     "prepare": "husky",

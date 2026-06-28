@@ -296,6 +296,30 @@ No uninstall or manual reinstall is required on supported platforms. This is fre
 
 Web and npm installs continue to use the existing update notification flow (`npm install -g @orca-ai/orca@latest` or git pull).
 
+### Publishing (maintainers)
+
+**GitHub Release + desktop installers:**
+
+```bash
+./release.sh --increment=patch
+gh release create vX.Y.Z --title "Orca vX.Y.Z" --notes-file CHANGELOG.md   # if release-it skips GitHub
+gh workflow run desktop-release.yml -f tag=vX.Y.Z                          # re-run desktop builds
+```
+
+Add to `.env` (never commit):
+
+```env
+GITHUB_TOKEN=ghp_...   # repo scope PAT for release-it
+NPM_TOKEN=npm_...      # publish token with Bypass 2FA enabled
+```
+
+**npm publish** (if not using release-it npm step):
+
+```bash
+npm login
+npm publish --access public --otp=123456   # use authenticator code if 2FA enabled
+```
+
 ---
 
 ## Theming & appearance
