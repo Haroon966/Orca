@@ -6,6 +6,7 @@ import { authenticatedFetch } from "../../../utils/api";
 import { ReleaseInfo } from "../../../types/sharedTypes";
 import { copyTextToClipboard } from "../../../utils/clipboard";
 import type { InstallMode } from "../../../hooks/useVersionCheck";
+import { useDesktopUpdater } from "../../../hooks/useDesktopUpdater";
 import { IS_PLATFORM } from "../../../constants/config";
 
 interface VersionUpgradeModalProps {
@@ -28,6 +29,14 @@ export function VersionUpgradeModal({
     installMode
 }: VersionUpgradeModalProps) {
     const { t } = useTranslation('common');
+    const isDesktop = installMode === 'desktop';
+    const {
+        downloadProgress,
+        updateDownloaded,
+        updateError: desktopUpdateError,
+        downloadUpdate,
+        installUpdate,
+    } = useDesktopUpdater();
     const upgradeCommand = installMode === 'npm'
         ? t('versionUpdate.npmUpgradeCommand')
         : IS_PLATFORM
@@ -37,6 +46,8 @@ export function VersionUpgradeModal({
     const [updateOutput, setUpdateOutput] = useState('');
     const [updateError, setUpdateError] = useState('');
     const [reloadCountdown, setReloadCountdown] = useState<number | null>(null);
+    const displayedLatestVersion = latestVersion ?? updateDownloaded?.version ?? null;
+    const combinedError = updateError || desktopUpdateError || '';
 
     useEffect(() => {
         if (!IS_PLATFORM || reloadCountdown === null || reloadCountdown <= 0) {
@@ -58,12 +69,24 @@ export function VersionUpgradeModal({
 
     const handleUpdateNow = useCallback(async () => {
         setIsUpdating(true);
-        setUpdateOutput('Starting update...\n');
-        setReloadCountdown(IS_PLATFORM ? RELOAD_COUNTDOWN_START : null);
         setUpdateError('');
 
+        if (isDesktop) {
+            try {
+                await downloadUpdate();
+            } catch (error: unknown) {
+                const message = error instanceof Error ? error.message : 'Update failed';
+                setUpdateError(message);
+            } finally {
+                setIsUpdating(false);
+            }
+            return;
+        }
+
+        setUpdateOutput('Starting update...\n');
+        setReloadCountdown(IS_PLATFORM ? RELOAD_COUNTDOWN_START : null);
+
         try {
-            // Call the backend API to run the update command
             const response = await authenticatedFetch('/api/system/update', {
                 method: 'POST',
             });
@@ -78,28 +101,44 @@ export function VersionUpgradeModal({
                 setUpdateError(data.error || 'Update failed');
                 setUpdateOutput(prev => prev + '\n❌ Update failed: ' + (data.error || 'Unknown error') + '\n');
             }
-        } catch (error: any) {
-            setUpdateError(error.message);
-            setUpdateOutput(prev => prev + '\n❌ Update failed: ' + error.message + '\n');
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : 'Update failed';
+            setUpdateError(message);
+            setUpdateOutput(prev => prev + '\n❌ Update failed: ' + message + '\n');
         } finally {
             setIsUpdating(false);
         }
-    }, []);
+    }, [downloadUpdate, isDesktop]);
+
+    const handleInstallUpdate = useCallback(async () => {
+        if (!isDesktop) {
+            return;
+        }
+
+        try {
+            await installUpdate();
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : 'Install failed';
+            setUpdateError(message);
+        }
+    }, [installUpdate, isDesktop]);
 
     if (!isOpen) return null;
 
+    const showManualUpgrade = !isDesktop && !isUpdating && !updateOutput;
+    const showDesktopProgress = isDesktop && (isUpdating || downloadProgress !== null);
+    const showServerOutput = !isDesktop && (updateOutput || combinedError);
+    const showRestartButton = isDesktop && updateDownloaded !== null;
+
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-            {/* Backdrop */}
             <button
                 className="fixed inset-0 bg-black/50 backdrop-blur-sm"
                 onClick={onClose}
                 aria-label={t('versionUpdate.ariaLabels.closeModal')}
             />
 
-            {/* Modal */}
             <div className="relative mx-4 max-h-[90vh] w-full max-w-2xl space-y-4 overflow-y-auto rounded-lg border border-gray-200 bg-white p-6 shadow-xl dark:border-gray-700 dark:bg-gray-800">
-                {/* Header */}
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/30">
@@ -124,7 +163,6 @@ export function VersionUpgradeModal({
                     </button>
                 </div>
 
-                {/* Version Info */}
                 <div className="space-y-3">
                     <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3 dark:bg-gray-700/50">
                         <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('versionUpdate.currentVersion')}</span>
@@ -132,11 +170,10 @@ export function VersionUpgradeModal({
                     </div>
                     <div className="flex items-center justify-between rounded-lg border border-blue-200 bg-blue-50 p-3 dark:border-blue-700 dark:bg-blue-900/20">
                         <span className="text-sm font-medium text-blue-700 dark:text-blue-300">{t('versionUpdate.latestVersion')}</span>
-                        <span className="font-mono text-sm text-blue-900 dark:text-blue-100">{latestVersion}</span>
+                        <span className="font-mono text-sm text-blue-900 dark:text-blue-100">{displayedLatestVersion}</span>
                     </div>
                 </div>
 
-                {/* Changelog */}
                 {releaseInfo?.body && (
                     <div className="space-y-3">
                         <div className="flex items-center justify-between">
@@ -165,8 +202,25 @@ export function VersionUpgradeModal({
                     </div>
                 )}
 
-                {/* Update Output */}
-                {(updateOutput || updateError) && (
+                {showDesktopProgress && (
+                    <div className="space-y-2">
+                        <h3 className="text-sm font-medium text-gray-900 dark:text-white">{t('versionUpdate.updateProgress')}</h3>
+                        <p className="text-xs text-gray-600 dark:text-gray-400">{t('versionUpdate.desktopUpdatingHint')}</p>
+                        <div className="h-2 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
+                            <div
+                                className="h-full rounded-full bg-blue-600 transition-all duration-200"
+                                style={{ width: `${Math.max(0, Math.min(100, downloadProgress?.percent ?? 0))}%` }}
+                            />
+                        </div>
+                        {downloadProgress && (
+                            <p className="text-xs text-gray-600 dark:text-gray-400">
+                                {t('versionUpdate.desktopDownloadProgress', { percent: Math.round(downloadProgress.percent) })}
+                            </p>
+                        )}
+                    </div>
+                )}
+
+                {showServerOutput && (
                     <div className="space-y-2">
                         <h3 className="text-sm font-medium text-gray-900 dark:text-white">{t('versionUpdate.updateProgress')}</h3>
                         <div className="max-h-48 overflow-y-auto rounded-lg border border-gray-700 bg-gray-900 p-4 dark:bg-gray-950">
@@ -179,16 +233,37 @@ export function VersionUpgradeModal({
                                     : `Refresh the page in ${reloadCountdown} ${reloadCountdown === 1 ? 'second' : 'seconds'}. If that doesn\'t work, RESTART the environment.`}
                             </div>
                         )}
-                        {updateError && (
-                            <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700 dark:border-red-900/40 dark:bg-red-900/20 dark:text-red-200">
-                                {updateError}
-                            </div>
+                    </div>
+                )}
+
+                {combinedError && (
+                    <div className="space-y-2">
+                        <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700 dark:border-red-900/40 dark:bg-red-900/20 dark:text-red-200">
+                            {combinedError}
+                        </div>
+                        {isDesktop && releaseInfo?.htmlUrl && (
+                            <p className="text-xs text-gray-600 dark:text-gray-400">
+                                {t('versionUpdate.desktopDebFallback')}{' '}
+                                <a
+                                    href={releaseInfo.htmlUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-blue-600 hover:underline dark:text-blue-400"
+                                >
+                                    {t('versionUpdate.viewFullRelease')}
+                                </a>
+                            </p>
                         )}
                     </div>
                 )}
 
-                {/* Upgrade Instructions */}
-                {!isUpdating && !updateOutput && (
+                {isDesktop && updateDownloaded && (
+                    <div className="rounded-md border border-green-200 bg-green-50 px-3 py-2 text-xs text-green-700 dark:border-green-900/40 dark:bg-green-900/20 dark:text-green-200">
+                        {t('versionUpdate.desktopRestartToInstall', { version: updateDownloaded.version })}
+                    </div>
+                )}
+
+                {showManualUpgrade && (
                     <div className="space-y-3">
                         <h3 className="text-sm font-medium text-gray-900 dark:text-white">{t('versionUpdate.manualUpgrade')}</h3>
                         <div className="rounded-lg border bg-gray-100 p-3 dark:bg-gray-800">
@@ -202,22 +277,29 @@ export function VersionUpgradeModal({
                     </div>
                 )}
 
-                {/* Actions */}
+                {isDesktop && !showManualUpgrade && !showRestartButton && !showDesktopProgress && (
+                    <p className="text-xs text-gray-600 dark:text-gray-400">
+                        {t('versionUpdate.desktopUpdatingHint')}
+                    </p>
+                )}
+
                 <div className="flex gap-2 pt-2">
                     <button
                         onClick={onClose}
                         className="flex-1 rounded-md bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
                     >
-                        {updateOutput ? t('versionUpdate.buttons.close') : t('versionUpdate.buttons.later')}
+                        {updateOutput || showRestartButton ? t('versionUpdate.buttons.close') : t('versionUpdate.buttons.later')}
                     </button>
-                    {!updateOutput && (
+                    {!updateOutput && !showRestartButton && (
                         <>
-                            <button
-                                onClick={() => copyTextToClipboard(upgradeCommand)}
-                                className="flex-1 rounded-md bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
-                            >
-                                {t('versionUpdate.buttons.copyCommand')}
-                            </button>
+                            {!isDesktop && (
+                                <button
+                                    onClick={() => copyTextToClipboard(upgradeCommand)}
+                                    className="flex-1 rounded-md bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+                                >
+                                    {t('versionUpdate.buttons.copyCommand')}
+                                </button>
+                            )}
                             <button
                                 onClick={handleUpdateNow}
                                 disabled={isUpdating}
@@ -234,6 +316,14 @@ export function VersionUpgradeModal({
                             </button>
                         </>
                     )}
+                    {showRestartButton && (
+                        <button
+                            onClick={handleInstallUpdate}
+                            className="flex flex-1 items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+                        >
+                            {t('versionUpdate.buttons.restartToInstall')}
+                        </button>
+                    )}
                 </div>
             </div>
         </div>
@@ -248,21 +338,14 @@ const changelogComponents = {
     ),
 };
 
-// Clean up changelog by removing GitHub-specific metadata
 const cleanChangelog = (body: string) => {
     if (!body) return '';
 
     return body
-        // Remove full commit hashes (40 character hex strings)
         .replace(/\b[0-9a-f]{40}\b/gi, '')
-        // Remove short commit hashes (7-10 character hex strings at start of line or after dash/space)
         .replace(/(?:^|\s|-)([0-9a-f]{7,10})\b/gi, '')
-        // Remove "Full Changelog" links
         .replace(/\*\*Full Changelog\*\*:.*$/gim, '')
-        // Remove compare links (e.g., https://github.com/.../compare/v1.0.0...v1.0.1)
         .replace(/https?:\/\/github\.com\/[^\/]+\/[^\/]+\/compare\/[^\s)]+/gi, '')
-        // Clean up multiple consecutive empty lines
         .replace(/\n\s*\n\s*\n/g, '\n\n')
-        // Trim whitespace
         .trim();
 };

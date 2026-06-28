@@ -78,7 +78,9 @@ const __dirname = getModuleDir(import.meta.url);
 // The server source runs from /server, while the compiled output runs from /dist-server/server.
 // Resolving the app root once keeps every repo-level lookup below aligned across both layouts.
 const APP_ROOT = findAppRoot(__dirname);
-const installMode = fs.existsSync(path.join(APP_ROOT, '.git')) ? 'git' : 'npm';
+const installMode = process.env.ORCA_DESKTOP === '1'
+    ? 'desktop'
+    : fs.existsSync(path.join(APP_ROOT, '.git')) ? 'git' : 'npm';
 // Version of the code that is actually running, captured once at process
 // startup. This intentionally does NOT re-read package.json per request: after
 // an update replaces the files on disk, package.json reflects the NEW version
@@ -256,6 +258,12 @@ app.use(express.static(path.join(APP_ROOT, 'dist'), {
 // System update endpoint
 app.post('/api/system/update', authenticateToken, async (req, res) => {
     try {
+        if (installMode === 'desktop') {
+            return res.status(400).json({
+                error: 'Desktop installs update in-app. Use Update Now in the Orca app, then Restart to install.',
+            });
+        }
+
         // Get the project root directory (parent of server directory)
         const projectRoot = APP_ROOT;
 

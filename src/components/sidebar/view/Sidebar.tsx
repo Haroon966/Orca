@@ -1,8 +1,9 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ORCA_GITHUB } from '../../../config/orca';
 import { useDeviceSettings } from '../../../hooks/useDeviceSettings';
+import { useDesktopUpdater } from '../../../hooks/useDesktopUpdater';
 import { useVersionCheck } from '../../../hooks/useVersionCheck';
 import { useUiPreferences } from '../../../hooks/useUiPreferences';
 import { useSidebarController } from '../hooks/useSidebarController';
@@ -131,6 +132,16 @@ function Sidebar({
     sidebarVisible,
   });
 
+  const handleDesktopUpdateAvailable = useCallback(() => {
+    setShowVersionModal(true);
+  }, [setShowVersionModal]);
+
+  const { updateAvailable: desktopUpdateAvailable } = useDesktopUpdater({
+    onUpdateAvailable: handleDesktopUpdateAvailable,
+  });
+
+  const effectiveUpdateAvailable = updateAvailable || Boolean(desktopUpdateAvailable);
+
   useEffect(() => {
     if (typeof document === 'undefined') {
       return;
@@ -225,7 +236,7 @@ function Sidebar({
         <SidebarCollapsed
           onExpand={handleExpandSidebar}
           onShowSettings={onShowSettings}
-          updateAvailable={updateAvailable}
+          updateAvailable={effectiveUpdateAvailable}
           restartRequired={restartRequired}
           onShowVersionModal={() => setShowVersionModal(true)}
           t={t}
@@ -297,7 +308,7 @@ function Sidebar({
             }}
             isRefreshing={isRefreshing}
             onCollapseSidebar={handleCollapseSidebar}
-            updateAvailable={updateAvailable}
+            updateAvailable={effectiveUpdateAvailable}
             restartRequired={restartRequired}
             releaseInfo={releaseInfo}
             latestVersion={latestVersion}

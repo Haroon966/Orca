@@ -34,6 +34,7 @@ Refined UI/UX · Navy + ice theming · Deep appearance customization · Local-fi
 - [Why Orca?](#why-orca)
 - [Features](#features)
 - [Quick start](#quick-start)
+- [Install](#install)
 - [Production](#production)
 - [Configuration](#configuration)
 - [CLI](#cli)
@@ -149,6 +150,50 @@ npm run dev
 
 ---
 
+## Install
+
+**Requirements (all installs):** [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code) installed and authenticated
+
+### Windows
+
+Download the latest `Orca-x.y.z-x64.exe` from [GitHub Releases](https://github.com/Haroon966/Orca/releases), run the installer, then launch **Orca** from the Start menu.
+
+Future updates install in-app: click **Update Now**, then **Restart to install** — no uninstall required.
+
+> Unsigned builds may show a SmartScreen prompt on first run — choose **More info → Run anyway**.
+
+### Ubuntu / Linux
+
+Download from [GitHub Releases](https://github.com/Haroon966/Orca/releases):
+
+**AppImage (recommended for one-click updates):**
+
+```bash
+chmod +x Orca-x.y.z-x86_64.AppImage
+./Orca-x.y.z-x86_64.AppImage
+```
+
+Future updates install in-app: **Update Now** → **Restart to install** — no uninstall required.
+
+**`.deb` (traditional Ubuntu/Debian install):**
+
+```bash
+sudo dpkg -i Orca-x.y.z-amd64.deb
+```
+
+Launch **Orca** from your applications menu. To upgrade later, install the new `.deb` over the old one (`sudo dpkg -i Orca-new-version-amd64.deb`) — no uninstall required, but not fully in-app.
+
+### npm (developers)
+
+If you already have [Node.js 22+](https://nodejs.org/):
+
+```bash
+npm install -g @orca-ai/orca
+orca
+```
+
+---
+
 ## Production
 
 ```bash
@@ -214,10 +259,42 @@ VITE_GITHUB_REPO=Orca
 
 ## Desktop
 
+Orca ships as a desktop app for Windows, Ubuntu/Linux, and macOS. Installers are attached to each [GitHub Release](https://github.com/Haroon966/Orca/releases).
+
+### Development
+
 ```bash
-npm run desktop:dev   # dev: run npm run dev in another terminal first
-npm run desktop:pack  # build + unpackaged Electron app
+npm run desktop:dev   # run npm run dev in another terminal first
+npm run desktop:pack  # build + unpackaged Electron app (local testing)
 ```
+
+### Build installers locally
+
+```bash
+npm run desktop:dist:win     # Windows .exe
+npm run desktop:dist:linux   # Linux .deb + AppImage
+npm run desktop:dist:mac     # macOS .dmg + .zip
+```
+
+### Auto-update
+
+When a new [GitHub Release](https://github.com/Haroon966/Orca/releases) is published, the desktop app checks for updates on launch and every 4 hours. Users see an **Update Available** prompt in the sidebar:
+
+1. Click **Update Now** — the new version downloads in the background
+2. Click **Restart to install** — Orca relaunches on the new version
+
+No uninstall or manual reinstall is required on supported platforms. This is free (GitHub Releases + `electron-updater`).
+
+| Platform | In-app auto-update |
+| :------- | :----------------- |
+| Windows (`.exe`) | Full download + restart to install |
+| macOS (`.zip`) | Full download + restart to install |
+| Linux (AppImage) | Full download + restart to install |
+| Linux (`.deb`) | Update notification + download new `.deb` from GitHub Releases |
+
+> Auto-update only works in **packaged** desktop installs (`.exe`, AppImage, etc.), not in `npm run dev` or `desktop:dev`.
+
+Web and npm installs continue to use the existing update notification flow (`npm install -g @orca-ai/orca@latest` or git pull).
 
 ---
 

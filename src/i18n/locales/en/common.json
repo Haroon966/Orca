@@ -247,6 +247,10 @@
     "manualUpgrade": "Manual upgrade:",
     "npmUpgradeCommand": "npm install -g @orca-ai/orca@latest",
     "manualUpgradeHint": "Or click \"Update Now\" to run the update automatically.",
+    "desktopDownloadProgress": "Downloaded {{percent}}%",
+    "desktopRestartToInstall": "Version {{version}} is ready. Restart Orca to finish installing.",
+    "desktopUpdatingHint": "Click Update Now to download the new version, then Restart to install. No uninstall required — Orca updates in place.",
+    "desktopDebFallback": "If in-app update fails on a .deb install, download the new package from the release page and run: sudo dpkg -i Orca-x.y.z-amd64.deb",
     "updateCompleted": "Update completed successfully!",
     "restartServer": "Please restart the server to apply changes.",
     "updateFailed": "Update failed",
@@ -255,7 +259,8 @@
       "later": "Later",
       "copyCommand": "Copy Command",
       "updateNow": "Update Now",
-      "updating": "Updating..."
+      "updating": "Updating...",
+      "restartToInstall": "Restart to install"
     },
     "ariaLabels": {
       "closeModal": "Close version upgrade modal",
