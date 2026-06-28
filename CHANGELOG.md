@@ -1,5 +1,16 @@
 # Changelog
 
+All notable changes to Orca will be documented in this file.
+
+
+## 1.34.1 (2026-06-28)
+
+### New Features
+
+* add desktop installers and in-app auto-update ([c79d4b6](https://github.com/Haroon966/Orca/commit/c79d4b60832c1bc0ff4fa09205966dc628a360b1))
+
+# Changelog
+
 All notable changes to CloudCLI UI will be documented in this file.
 
 
