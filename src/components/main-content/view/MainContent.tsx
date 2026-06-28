@@ -17,6 +17,8 @@ import { useEditorSidebar } from '../../code-editor/hooks/useEditorSidebar';
 import EditorSidebar from '../../code-editor/view/EditorSidebar';
 import type { Project } from '../../../types/app';
 import { TaskMasterPanel } from '../../task-master';
+import { buildTaskImplementPrompt } from '../../task-master/utils/buildTaskImplementPrompt';
+import type { TaskMasterTask } from '../../task-master/types';
 import { usePlugins } from '../../../contexts/PluginsContext';
 import { useSidePanel } from '../hooks/useSidePanel';
 
@@ -57,6 +59,9 @@ function MainContent({
   onShowSettings,
   externalMessageUpdate,
   newSessionTrigger,
+  pendingChatMessage,
+  onPendingChatMessageApplied,
+  onImplementTaskInChat,
 }: MainContentProps) {
   const { t } = useTranslation();
   const { plugins } = usePlugins();
@@ -183,7 +188,14 @@ function MainContent({
     }
 
     if (sidePanel === 'tasks' && shouldShowTasksTab) {
-      return <TaskMasterPanel isVisible />;
+      return (
+        <TaskMasterPanel
+          isVisible
+          onImplementTaskInChat={onImplementTaskInChat
+            ? (task: TaskMasterTask) => onImplementTaskInChat(buildTaskImplementPrompt(task))
+            : undefined}
+        />
+      );
     }
 
     if (sidePanel === 'browser' && shouldShowBrowserTab) {
@@ -249,6 +261,8 @@ function MainContent({
                 sendByCtrlEnter={sendByCtrlEnter}
                 externalMessageUpdate={externalMessageUpdate}
                 newSessionTrigger={newSessionTrigger}
+                pendingChatMessage={pendingChatMessage}
+                onPendingChatMessageApplied={onPendingChatMessageApplied}
                 onShowAllTasks={tasksEnabled ? () => setActiveTab('tasks') : null}
               />
             </ErrorBoundary>

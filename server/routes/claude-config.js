@@ -456,4 +456,68 @@ router.get('/rules/file', async (req, res) => {
   }
 });
 
+router.put('/agents/file', async (req, res) => {
+  try {
+    const { filePath, content, projectPath } = req.body;
+    if (!filePath || typeof content !== 'string') {
+      return res.status(400).json({ error: 'filePath and content are required' });
+    }
+
+    const resolved = path.resolve(filePath);
+    if (!isAgentPathAllowed(resolved, projectPath)) {
+      return res.status(403).json({ error: 'Path is outside allowed agent directories' });
+    }
+
+    await ensureParentDir(resolved);
+    await fsPromises.writeFile(resolved, content, 'utf8');
+    res.json({ success: true, path: resolved });
+  } catch (error) {
+    console.error('Error writing agent file:', error);
+    res.status(500).json({ error: error.message || 'Failed to write agent file' });
+  }
+});
+
+router.put('/rules/file', async (req, res) => {
+  try {
+    const { filePath, content, projectPath } = req.body;
+    if (!filePath || !projectPath || typeof content !== 'string') {
+      return res.status(400).json({ error: 'filePath, projectPath, and content are required' });
+    }
+
+    const resolved = path.resolve(filePath);
+    const rulesRoot = path.resolve(path.join(projectPath, '.claude', 'rules'));
+    if (!resolved.startsWith(`${rulesRoot}${path.sep}`) && resolved !== rulesRoot) {
+      return res.status(403).json({ error: 'Path is outside project rules directory' });
+    }
+
+    await ensureParentDir(resolved);
+    await fsPromises.writeFile(resolved, content, 'utf8');
+    res.json({ success: true, path: resolved });
+  } catch (error) {
+    console.error('Error writing rule file:', error);
+    res.status(500).json({ error: error.message || 'Failed to write rule file' });
+  }
+});
+
+router.put('/file', async (req, res) => {
+  try {
+    const { filePath, content, projectPath } = req.body;
+    if (!filePath || typeof content !== 'string') {
+      return res.status(400).json({ error: 'filePath and content are required' });
+    }
+
+    const resolved = path.resolve(filePath);
+    if (!isClaudeConfigPathAllowed(resolved, projectPath)) {
+      return res.status(403).json({ error: 'Path is outside allowed Claude config directories' });
+    }
+
+    await ensureParentDir(resolved);
+    await fsPromises.writeFile(resolved, content, 'utf8');
+    res.json({ success: true, path: resolved });
+  } catch (error) {
+    console.error('Error writing config file:', error);
+    res.status(500).json({ error: error.message || 'Failed to write config file' });
+  }
+});
+
 export default router;

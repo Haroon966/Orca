@@ -1,4 +1,5 @@
-import { ExternalLink, Star } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { AlertTriangle, CheckCircle2, ExternalLink, Loader2, Star, XCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { IS_PLATFORM } from '../../../../constants/config';
 import { useVersionCheck } from '../../../../hooks/useVersionCheck';
@@ -8,6 +9,22 @@ import {
   ORCA_PRODUCT_NAME,
   ORCA_TAGLINE,
 } from '../../../../config/orca';
+import { authenticatedFetch } from '../../../../utils/api';
+
+type HealthData = {
+  claudeCli?: { found: boolean; path: string; version: string | null };
+  dataDir?: string;
+  dataDirExists?: boolean;
+  taskMaster?: { installed: boolean; version: string | null };
+  browser?: { enabled: boolean; available: boolean };
+  server?: { host: string; bindWarning: boolean; bindWarningMessage: string | null };
+};
+
+function StatusIcon({ ok, warn }: { ok?: boolean; warn?: boolean }) {
+  if (ok) return <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />;
+  if (warn) return <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400" />;
+  return <XCircle className="h-4 w-4 text-red-600 dark:text-red-400" />;
+}
 
 function GitHubIcon({ className }: { className?: string }) {
   return (
@@ -24,6 +41,26 @@ export default function AboutTab() {
     ORCA_GITHUB.repo,
   );
   const releasesUrl = releaseInfo?.htmlUrl || `${ORCA_GITHUB_URL}/releases`;
+  const [health, setHealth] = useState<HealthData | null>(null);
+  const [healthLoading, setHealthLoading] = useState(true);
+
+  useEffect(() => {
+    const loadHealth = async () => {
+      try {
+        const response = await authenticatedFetch('/api/health');
+        if (response.ok) {
+          const payload = await response.json();
+          setHealth(payload.data ?? payload);
+        }
+      } catch {
+        // Non-fatal
+      } finally {
+        setHealthLoading(false);
+      }
+    };
+
+    void loadHealth();
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -70,6 +107,78 @@ export default function AboutTab() {
           <span>Star on GitHub</span>
         </a>
       )}
+
+      <div className="rounded-lg border border-border bg-card/40 p-4">
+        <h4 className="text-sm font-semibold text-foreground">
+          {t('about.health.title', { defaultValue: 'System health' })}
+        </h4>
+        <p className="mt-1 text-xs text-muted-foreground">
+          {t('about.health.description', { defaultValue: 'Runtime status for Claude CLI, data paths, and optional features.' })}
+        </p>
+
+        {healthLoading ? (
+          <div className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            {t('about.health.loading', { defaultValue: 'Checking…' })}
+          </div>
+        ) : health ? (
+          <ul className="mt-4 space-y-2 text-sm">
+            <li className="flex items-start gap-2">
+              <StatusIcon ok={health.claudeCli?.found} />
+              <div>
+                <span className="font-medium">{t('about.health.claudeCli', { defaultValue: 'Claude CLI' })}</span>
+                <p className="text-xs text-muted-foreground">
+                  {health.claudeCli?.found
+                    ? `${health.claudeCli.path}${health.claudeCli.version ? ` · ${health.claudeCli.version}` : ''}`
+                    : t('about.health.notFound', { defaultValue: 'Not found' })}
+                </p>
+              </div>
+            </li>
+            <li className="flex items-start gap-2">
+              <StatusIcon ok={health.dataDirExists} warn={!health.dataDirExists} />
+              <div>
+                <span className="font-medium">{t('about.health.dataDir', { defaultValue: 'Data directory' })}</span>
+                <p className="text-xs text-muted-foreground">{health.dataDir}</p>
+              </div>
+            </li>
+            <li className="flex items-start gap-2">
+              <StatusIcon ok={health.taskMaster?.installed} />
+              <div>
+                <span className="font-medium">{t('about.health.taskMaster', { defaultValue: 'TaskMaster' })}</span>
+                <p className="text-xs text-muted-foreground">
+                  {health.taskMaster?.installed
+                    ? (health.taskMaster.version ?? t('about.health.installed', { defaultValue: 'Installed' }))
+                    : t('about.health.notInstalled', { defaultValue: 'Not installed' })}
+                </p>
+              </div>
+            </li>
+            <li className="flex items-start gap-2">
+              <StatusIcon ok={health.browser?.available} warn={Boolean(health.browser?.enabled && !health.browser?.available)} />
+              <div>
+                <span className="font-medium">{t('about.health.browser', { defaultValue: 'Browser runtime' })}</span>
+                <p className="text-xs text-muted-foreground">
+                  {health.browser?.available
+                    ? t('about.health.ready', { defaultValue: 'Ready' })
+                    : health.browser?.enabled
+                      ? t('about.health.setupRequired', { defaultValue: 'Setup required' })
+                      : t('about.health.disabled', { defaultValue: 'Disabled' })}
+                </p>
+              </div>
+            </li>
+            <li className="flex items-start gap-2">
+              <StatusIcon ok={!health.server?.bindWarning} warn={health.server?.bindWarning} />
+              <div>
+                <span className="font-medium">{t('about.health.server', { defaultValue: 'Server bind' })}</span>
+                <p className="text-xs text-muted-foreground">
+                  {health.server?.bindWarning
+                    ? (health.server.bindWarningMessage ?? health.server.host)
+                    : health.server?.host}
+                </p>
+              </div>
+            </li>
+          </ul>
+        ) : null}
+      </div>
 
       <div className="border-t border-border/50 pt-4">
         <p className="text-xs text-muted-foreground/60">Licensed under AGPL-3.0</p>

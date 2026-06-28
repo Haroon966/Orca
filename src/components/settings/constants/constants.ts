@@ -2,6 +2,7 @@ import type { ComponentType } from 'react';
 import {
   Bell,
   Bot,
+  FileCode2,
   GitBranch,
   Info,
   KeyRound,
@@ -28,15 +29,16 @@ export type SettingsMainTabMeta = {
 };
 
 export const SETTINGS_MAIN_TABS: SettingsMainTabMeta[] = [
-  { id: 'agents', label: 'Agents', keywords: 'agents subagents claude code', icon: Bot },
+  { id: 'agents', label: 'Agents', keywords: 'agents subagents claude code mcp', icon: Bot },
+  { id: 'claude-config', label: 'Claude Config', keywords: 'claude config claude.md hooks memory skills agents rules', icon: FileCode2 },
   { id: 'appearance', label: 'Appearance', keywords: 'appearance theme dark light language', icon: Palette },
   { id: 'git', label: 'Git', keywords: 'git github commits', icon: GitBranch },
   { id: 'api', label: 'API Tokens', keywords: 'api tokens auth keys', icon: KeyRound },
   { id: 'tasks', label: 'Tasks', keywords: 'tasks taskmaster', icon: ListChecks },
   { id: 'browser', label: 'Browser', keywords: 'browser playwright chromium automation', icon: MonitorPlay },
-  { id: 'notifications', label: 'Notifications', keywords: 'notifications alerts push', icon: Bell },
   { id: 'plugins', label: 'Plugins', keywords: 'plugins extensions integrations', icon: Plug },
-  { id: 'about', label: 'About', keywords: 'about version info', icon: Info },
+  { id: 'notifications', label: 'Notifications', keywords: 'notifications alerts push', icon: Bell },
+  { id: 'about', label: 'About', keywords: 'about version info health', icon: Info },
 ];
 
 export const AGENT_PROVIDERS: AgentProvider[] = ['claude', 'cursor', 'codex', 'gemini', 'opencode'];

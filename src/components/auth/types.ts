@@ -20,6 +20,10 @@ export type AuthContextValue = {
   isLoading: boolean;
   hasCompletedOnboarding: boolean;
   refreshOnboardingStatus: () => Promise<void>;
+  isAuthenticated: boolean;
+  authRequired: boolean;
+  needsSetup: boolean;
+  refreshAuth: () => Promise<void>;
 };
 
 export type AuthProviderProps = {

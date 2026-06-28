@@ -60,6 +60,8 @@ interface UseChatComposerStateArgs {
   addMessage: (msg: ChatMessage) => void;
   setIsUserScrolledUp: (isScrolledUp: boolean) => void;
   setPendingPermissionRequests: Dispatch<SetStateAction<PendingPermissionRequest[]>>;
+  pendingChatMessage?: string | null;
+  onPendingChatMessageApplied?: () => void;
 }
 
 interface MentionableFile {
@@ -187,6 +189,8 @@ export function useChatComposerState({
   addMessage,
   setIsUserScrolledUp,
   setPendingPermissionRequests,
+  pendingChatMessage,
+  onPendingChatMessageApplied,
 }: UseChatComposerStateArgs) {
   const [input, setInput] = useState(() => {
     if (typeof window !== 'undefined' && selectedProject) {
@@ -208,6 +212,18 @@ export function useChatComposerState({
     ((event: FormEvent<HTMLFormElement> | MouseEvent | TouchEvent | KeyboardEvent<HTMLTextAreaElement>) => Promise<void>) | null
   >(null);
   const inputValueRef = useRef(input);
+
+  useEffect(() => {
+    if (!pendingChatMessage) {
+      return;
+    }
+    setInput(pendingChatMessage);
+    inputValueRef.current = pendingChatMessage;
+    if (selectedProject) {
+      safeLocalStorage.setItem(`draft_input_${selectedProject.projectId}`, pendingChatMessage);
+    }
+    onPendingChatMessageApplied?.();
+  }, [pendingChatMessage, onPendingChatMessageApplied, selectedProject]);
   const selectedProjectId = selectedProject?.projectId;
 
   const handleBuiltInCommand = useCallback(

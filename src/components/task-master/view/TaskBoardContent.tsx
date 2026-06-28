@@ -11,16 +11,19 @@ type TaskBoardContentProps = {
   filteredTasks: TaskMasterTask[];
   showParentTasks: boolean;
   onTaskClick: (task: TaskSelection) => void;
+  onImplementTaskInChat?: (task: TaskMasterTask) => void;
 };
 
 function KanbanColumns({
   columns,
   showParentTasks,
   onTaskClick,
+  onImplementTaskInChat,
 }: {
   columns: TaskKanbanColumn[];
   showParentTasks: boolean;
   onTaskClick: (task: TaskSelection) => void;
+  onImplementTaskInChat?: (task: TaskMasterTask) => void;
 }) {
   const { t } = useTranslation('tasks');
 
@@ -70,6 +73,7 @@ function KanbanColumns({
                   key={String(task.id)}
                   task={task}
                   onClick={() => onTaskClick(task)}
+                  onImplementInChat={onImplementTaskInChat ? () => onImplementTaskInChat(task) : null}
                   showParent={showParentTasks}
                   className="w-full shadow-sm hover:shadow-md"
                 />
@@ -89,6 +93,7 @@ export default function TaskBoardContent({
   filteredTasks,
   showParentTasks,
   onTaskClick,
+  onImplementTaskInChat,
 }: TaskBoardContentProps) {
   const { t } = useTranslation('tasks');
 
@@ -105,7 +110,14 @@ export default function TaskBoardContent({
   }
 
   if (viewMode === 'kanban') {
-    return <KanbanColumns columns={kanbanColumns} showParentTasks={showParentTasks} onTaskClick={onTaskClick} />;
+    return (
+      <KanbanColumns
+        columns={kanbanColumns}
+        showParentTasks={showParentTasks}
+        onTaskClick={onTaskClick}
+        onImplementTaskInChat={onImplementTaskInChat}
+      />
+    );
   }
 
   return (
@@ -115,6 +127,7 @@ export default function TaskBoardContent({
           key={String(task.id)}
           task={task}
           onClick={() => onTaskClick(task)}
+          onImplementInChat={onImplementTaskInChat ? () => onImplementTaskInChat(task) : null}
           showParent={showParentTasks}
           className={viewMode === 'grid' ? 'h-full' : ''}
         />

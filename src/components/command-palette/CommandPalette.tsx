@@ -15,6 +15,8 @@ import {
   X,
 } from 'lucide-react';
 
+import { useTasksSettings } from '../../contexts/TasksSettingsContext';
+
 import {
   Command,
   CommandEmpty,
@@ -61,6 +63,7 @@ const NAV_TABS: Array<{ id: AppTab; label: string; keywords: string }> = [
   { id: 'shell', label: 'Go to Shell', keywords: 'shell terminal console' },
   { id: 'git', label: 'Go to Git', keywords: 'git diff branches' },
   { id: 'tasks', label: 'Go to Tasks', keywords: 'tasks taskmaster' },
+  { id: 'browser', label: 'Go to Browser', keywords: 'browser playwright automation' },
 ];
 
 export default function CommandPalette({
@@ -75,6 +78,19 @@ export default function CommandPalette({
   const { toggleDarkMode } = useTheme();
   const navigate = useNavigate();
   const ops = usePaletteOps();
+  const { tasksEnabled, isTaskMasterInstalled } = useTasksSettings() as {
+    tasksEnabled: boolean;
+    isTaskMasterInstalled: boolean | null;
+  };
+  const [browserEnabled, setBrowserEnabled] = React.useState<boolean | null>(null);
+
+  React.useEffect(() => {
+    if (!open) return;
+    void fetch('/api/browser-use/status')
+      .then((response) => response.json())
+      .then((payload) => setBrowserEnabled(Boolean(payload?.data?.enabled)))
+      .catch(() => setBrowserEnabled(false));
+  }, [open]);
 
   const page = pages.at(-1);
 
@@ -221,15 +237,44 @@ export default function CommandPalette({
 
             {showActions && (
               <CommandGroup heading="Navigate">
-                {NAV_TABS.map((tab) => (
-                  <CommandItem
-                    key={tab.id as string}
-                    value={`${tab.label} ${tab.keywords}`}
-                    onSelect={() => run(() => onShowTab?.(tab.id))}
-                  >
-                    <span className="flex-1">{tab.label}</span>
-                  </CommandItem>
-                ))}
+                {NAV_TABS.map((tab) => {
+                  const tasksHidden = tab.id === 'tasks' && !(tasksEnabled && isTaskMasterInstalled);
+                  const browserHidden = tab.id === 'browser' && browserEnabled === false;
+
+                  if (tasksHidden || browserHidden) {
+                    const settingsTab = tab.id === 'tasks' ? 'tasks' : 'browser';
+                    return (
+                      <CommandItem
+                        key={`enable-${tab.id}`}
+                        value={`Enable ${tab.label} ${tab.keywords}`}
+                        onSelect={() => run(() => onOpenSettings(settingsTab))}
+                      >
+                        <span className="flex-1">Enable {tab.label.replace('Go to ', '')} in Settings</span>
+                      </CommandItem>
+                    );
+                  }
+
+                  return (
+                    <CommandItem
+                      key={tab.id as string}
+                      value={`${tab.label} ${tab.keywords}`}
+                      onSelect={() => run(() => onShowTab?.(tab.id))}
+                    >
+                      <span className="flex-1">{tab.label}</span>
+                    </CommandItem>
+                  );
+                })}
+              </CommandGroup>
+            )}
+
+            {showActions && (
+              <CommandGroup heading="Quick settings">
+                <CommandItem
+                  value="Open MCP settings agents model context protocol"
+                  onSelect={() => run(() => onOpenSettings('agents'))}
+                >
+                  <span className="flex-1">Settings: MCP servers</span>
+                </CommandItem>
               </CommandGroup>
             )}
 

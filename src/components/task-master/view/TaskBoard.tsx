@@ -22,6 +22,7 @@ type TaskBoardProps = {
   onShowPRDEditor?: ((file?: PrdFile) => void) | null;
   existingPRDs?: PrdFile[];
   onRefreshPRDs?: ((showNotification?: boolean) => void) | null;
+  onImplementTaskInChat?: ((task: TaskMasterTask) => void) | null;
 };
 
 export default function TaskBoard({
@@ -35,6 +36,7 @@ export default function TaskBoard({
   onShowPRDEditor = null,
   existingPRDs = [],
   onRefreshPRDs = null,
+  onImplementTaskInChat = null,
 }: TaskBoardProps) {
   const { projectTaskMaster, refreshProjects, refreshTasks, setCurrentProject } = useTaskMaster();
 
@@ -173,6 +175,7 @@ export default function TaskBoard({
         filteredTasks={filteredTasks}
         showParentTasks={showParentTasks}
         onTaskClick={(task) => onTaskClick?.(task)}
+        onImplementTaskInChat={onImplementTaskInChat ?? undefined}
       />
 
       <CreateTaskModal

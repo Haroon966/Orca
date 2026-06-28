@@ -34,6 +34,8 @@ import type {
   SkillsScope,
 } from '../types';
 
+import SkillsMarketplace from './SkillsMarketplace';
+
 type ProviderSkillsProps = {
   selectedProvider: SkillsProvider;
   currentProjects: SkillsProject[];
@@ -216,6 +218,7 @@ export default function ProviderSkills({ selectedProvider, currentProjects }: Pr
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [skillsView, setSkillsView] = useState<'installed' | 'marketplace'>('installed');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const folderInputRef = useRef<HTMLInputElement>(null);
 
@@ -227,6 +230,7 @@ export default function ProviderSkills({ selectedProvider, currentProjects }: Pr
     setSubmitError(null);
     setIsSubmitting(false);
     setSearchQuery('');
+    setSkillsView('installed');
   }, [selectedProvider]);
 
   useEffect(() => {
@@ -381,13 +385,48 @@ export default function ProviderSkills({ selectedProvider, currentProjects }: Pr
           variant="outline"
           size="sm"
           className="w-full sm:w-auto"
-          disabled={isLoading || isLoadingProjectScopes}
+          disabled={isLoading || isLoadingProjectScopes || skillsView !== 'installed'}
         >
           <RefreshCw className={cn('h-4 w-4', (isLoading || isLoadingProjectScopes) && 'animate-spin')} />
           Refresh
         </Button>
       </div>
 
+      <div className="flex gap-1 rounded-lg border border-border/70 bg-muted/20 p-1">
+        <button
+          type="button"
+          onClick={() => setSkillsView('installed')}
+          className={cn(
+            'flex-1 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+            skillsView === 'installed'
+              ? 'bg-background text-foreground shadow-sm'
+              : 'text-muted-foreground hover:text-foreground',
+          )}
+        >
+          {t('skillsMarketplace.tabs.installed')}
+        </button>
+        <button
+          type="button"
+          onClick={() => setSkillsView('marketplace')}
+          className={cn(
+            'flex-1 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+            skillsView === 'marketplace'
+              ? 'bg-background text-foreground shadow-sm'
+              : 'text-muted-foreground hover:text-foreground',
+          )}
+        >
+          {t('skillsMarketplace.tabs.marketplace')}
+        </button>
+      </div>
+
+      {skillsView === 'marketplace' ? (
+        <SkillsMarketplace
+          selectedProvider={selectedProvider}
+          installedSkills={skills}
+          onInstalled={() => refreshSkills({ force: true })}
+        />
+      ) : (
+        <>
       <Card className="min-w-0 overflow-hidden border-border/70 bg-background shadow-sm">
         <CardHeader className="space-y-3 border-b border-border/60 bg-muted/20">
           <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
@@ -649,6 +688,8 @@ export default function ProviderSkills({ selectedProvider, currentProjects }: Pr
           ))}
         </CardContent>
       </Card>
+        </>
+      )}
     </div>
   );
 }

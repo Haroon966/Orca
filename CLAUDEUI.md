@@ -42,7 +42,7 @@ npm run dev
 | Skills, agents, rules (read-only) | Settings → Claude Config |
 | MCP, permissions, plugins | Settings → Agents (inherited from upstream) |
 
-Claude-only mode is enabled by default. To show all upstream providers (Cursor, Codex, Gemini, OpenCode), set `CLAUDEUI_CLAUDE_ONLY = false` in [`src/config/claudeui.ts`](src/config/claudeui.ts).
+Claude-only mode is enabled by default. To show all upstream providers (Cursor, Codex, Gemini, OpenCode), set `ORCA_CLAUDE_ONLY = false` in [`src/config/orca.ts`](src/config/orca.ts).
 
 ## Production deployment
 
@@ -121,7 +121,7 @@ git merge upstream/main
 
 Custom ClaudeUI code lives in:
 
-- [`src/config/claudeui.ts`](src/config/claudeui.ts)
+- [`src/config/orca.ts`](src/config/orca.ts)
 - [`src/components/settings/view/tabs/claude-config/`](src/components/settings/view/tabs/claude-config/)
 - [`src/components/settings/hooks/useClaudeConfig.ts`](src/components/settings/hooks/useClaudeConfig.ts)
 - [`server/routes/claude-config.js`](server/routes/claude-config.js)

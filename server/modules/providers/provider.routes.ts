@@ -580,6 +580,28 @@ router.put(
 );
 
 router.get(
+  '/sessions/:sessionId/export',
+  asyncHandler(async (req: Request, res: Response) => {
+    const sessionId = parseSessionId(req.params.sessionId);
+    const formatRaw = readOptionalQueryString(req.query.format);
+    const format = formatRaw === 'jsonl' ? 'jsonl' : 'markdown';
+    const result = await sessionsService.exportSessionById(sessionId, format);
+    res.setHeader('Content-Type', result.mimeType);
+    res.setHeader('Content-Disposition', `attachment; filename="${result.filename}"`);
+    res.send(result.content);
+  }),
+);
+
+router.post(
+  '/sessions/:sessionId/fork',
+  asyncHandler(async (req: Request, res: Response) => {
+    const sessionId = parseSessionId(req.params.sessionId);
+    const result = await sessionsService.forkSessionById(sessionId);
+    res.json(createApiSuccessResponse(result));
+  }),
+);
+
+router.get(
   '/sessions/:sessionId/messages',
   asyncHandler(async (req: Request, res: Response) => {
     const sessionId = parseSessionId(req.params.sessionId);

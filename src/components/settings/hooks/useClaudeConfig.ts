@@ -213,6 +213,42 @@ export function useClaudeConfig(projectPath?: string) {
     return response.json() as Promise<{ content: string; path: string }>;
   }, [projectPath]);
 
+  const saveAgentFile = useCallback(async (filePath: string, content: string) => {
+    const response = await authenticatedFetch('/api/claude-config/agents/file', {
+      method: 'PUT',
+      body: JSON.stringify({ filePath, content, projectPath }),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to save agent file');
+    }
+    await loadAll();
+  }, [loadAll, projectPath]);
+
+  const saveRuleFile = useCallback(async (filePath: string, content: string) => {
+    if (!projectPath) {
+      throw new Error('Project path is required');
+    }
+    const response = await authenticatedFetch('/api/claude-config/rules/file', {
+      method: 'PUT',
+      body: JSON.stringify({ filePath, content, projectPath }),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to save rule file');
+    }
+    await loadAll();
+  }, [loadAll, projectPath]);
+
+  const saveConfigFile = useCallback(async (filePath: string, content: string) => {
+    const response = await authenticatedFetch('/api/claude-config/file', {
+      method: 'PUT',
+      body: JSON.stringify({ filePath, content, projectPath }),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to save config file');
+    }
+    await loadAll();
+  }, [loadAll, projectPath]);
+
   useEffect(() => {
     void loadAll();
   }, [loadAll]);
@@ -235,5 +271,8 @@ export function useClaudeConfig(projectPath?: string) {
     readAgentFile,
     readConfigFile,
     readRuleFile,
+    saveAgentFile,
+    saveRuleFile,
+    saveConfigFile,
   };
 }

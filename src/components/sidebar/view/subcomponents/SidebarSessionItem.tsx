@@ -1,9 +1,10 @@
 import { useEffect, useRef } from 'react';
-import { Check, Edit2, Loader2, Trash2, X } from 'lucide-react';
+import { Check, Copy, Download, Edit2, Loader2, Trash2, X } from 'lucide-react';
 import type { TFunction } from 'i18next';
 
 import { Badge, Button, Tooltip } from '../../../../shared/view/ui';
 import { cn } from '../../../../lib/utils';
+import { api } from '../../../../utils/api';
 import type { Project, ProjectSession, LLMProvider } from '../../../../types/app';
 import type { SessionWithProvider } from '../../types/types';
 import { createSessionViewModel } from '../../utils/utils';
@@ -116,6 +117,40 @@ export default function SidebarSessionItem({
 
   const requestDeleteSession = () => {
     onDeleteSession(project.projectId, session.id, sessionView.sessionName, session.__provider);
+  };
+
+  const handleExportSession = async (event: React.MouseEvent) => {
+    event.stopPropagation();
+    try {
+      const response = await api.exportSession(session.id, 'markdown');
+      if (!response.ok) return;
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = `session-${session.id.slice(0, 8)}.md`;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('[Sidebar] Export failed:', error);
+    }
+  };
+
+  const handleForkSession = async (event: React.MouseEvent) => {
+    event.stopPropagation();
+    try {
+      const response = await api.forkSession(session.id);
+      if (!response.ok) return;
+      const payload = await response.json();
+      const newSessionId = payload?.data?.sessionId;
+      if (typeof newSessionId === 'string' && newSessionId) {
+        window.location.assign(`/session/${newSessionId}`);
+      }
+    } catch (error) {
+      console.error('[Sidebar] Fork failed:', error);
+    }
   };
 
   return (
@@ -308,6 +343,20 @@ export default function SidebarSessionItem({
                   title={t('tooltips.editSessionName')}
                 >
                   <Edit2 className="h-3 w-3 text-gray-600 dark:text-gray-400" />
+                </button>
+                <button
+                  className="flex h-6 w-6 items-center justify-center rounded bg-gray-50 hover:bg-gray-100 dark:bg-gray-900/20 dark:hover:bg-gray-900/40"
+                  onClick={handleExportSession}
+                  title={t('tooltips.exportSession', 'Export session')}
+                >
+                  <Download className="h-3 w-3 text-gray-600 dark:text-gray-400" />
+                </button>
+                <button
+                  className="flex h-6 w-6 items-center justify-center rounded bg-gray-50 hover:bg-gray-100 dark:bg-gray-900/20 dark:hover:bg-gray-900/40"
+                  onClick={handleForkSession}
+                  title={t('tooltips.forkSession', 'Fork session')}
+                >
+                  <Copy className="h-3 w-3 text-gray-600 dark:text-gray-400" />
                 </button>
                 {!isProcessing && (
                   <button

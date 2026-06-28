@@ -305,4 +305,108 @@ export const sessionsService = {
     sessionsDb.updateSessionCustomName(sessionId, summary);
     return { sessionId, summary };
   },
+
+  async exportSessionById(
+    sessionId: string,
+    format: 'jsonl' | 'markdown' = 'markdown',
+  ): Promise<{ content: string; filename: string; mimeType: string }> {
+    const session = sessionsDb.getSessionById(sessionId);
+    if (!session) {
+      throw new AppError(`Session "${sessionId}" was not found.`, {
+        code: 'SESSION_NOT_FOUND',
+        statusCode: 404,
+      });
+    }
+
+    const baseName = (session.custom_name?.trim() || sessionId).replace(/[^\w.-]+/g, '_');
+
+    if (format === 'jsonl') {
+      if (!session.jsonl_path) {
+        throw new AppError('Session has no transcript file to export.', {
+          code: 'SESSION_EXPORT_EMPTY',
+          statusCode: 404,
+        });
+      }
+      const content = await fsp.readFile(session.jsonl_path, 'utf8');
+      return {
+        content,
+        filename: `${baseName}.jsonl`,
+        mimeType: 'application/x-ndjson',
+      };
+    }
+
+    const provider = session.provider as LLMProvider;
+    const providerSessionId = session.provider_session_id;
+    let messages: NormalizedMessage[] = [];
+
+    if (providerSessionId && session.project_path) {
+      const result = await providerRegistry.resolveProvider(provider).sessions.fetchHistory(sessionId, {
+        limit: null,
+        offset: 0,
+        projectPath: session.project_path,
+        providerSessionId,
+      });
+      messages = result.messages.map((message) => ({ ...message, sessionId }));
+    }
+
+    const lines: string[] = [`# ${session.custom_name?.trim() || 'Chat session'}`, ''];
+    for (const message of messages) {
+      const role = message.role ?? message.type ?? 'message';
+      const text = typeof message.content === 'string'
+        ? message.content
+        : JSON.stringify(message.content ?? message);
+      lines.push(`## ${role}`, '', text, '');
+    }
+
+    return {
+      content: lines.join('\n'),
+      filename: `${baseName}.md`,
+      mimeType: 'text/markdown',
+    };
+  },
+
+  async forkSessionById(sessionId: string): Promise<{ sessionId: string; sourceSessionId: string }> {
+    const session = sessionsDb.getSessionById(sessionId);
+    if (!session?.project_path) {
+      throw new AppError(`Session "${sessionId}" was not found.`, {
+        code: 'SESSION_NOT_FOUND',
+        statusCode: 404,
+      });
+    }
+
+    const newSessionId = randomUUID();
+    const newProviderSessionId = randomUUID();
+    sessionsDb.createAppSession(newSessionId, session.provider as LLMProvider, session.project_path);
+
+    if (session.jsonl_path) {
+      const sourceProviderId = session.provider_session_id ?? sessionId;
+      const raw = await fsp.readFile(session.jsonl_path, 'utf8');
+      const rewritten = raw
+        .split('\n')
+        .filter((line) => line.trim())
+        .map((line) => {
+          try {
+            const entry = JSON.parse(line) as Record<string, unknown>;
+            if (entry.sessionId === sourceProviderId) {
+              entry.sessionId = newProviderSessionId;
+            }
+            return JSON.stringify(entry);
+          } catch {
+            return line;
+          }
+        })
+        .join('\n');
+
+      const dir = path.dirname(session.jsonl_path);
+      const newJsonlPath = path.join(dir, `${newProviderSessionId}.jsonl`);
+      await fsp.writeFile(newJsonlPath, rewritten.endsWith('\n') ? rewritten : `${rewritten}\n`, 'utf8');
+
+      const forkName = session.custom_name?.trim()
+        ? `${session.custom_name.trim()} (fork)`
+        : 'Forked session';
+      sessionsDb.updateSessionTranscript(newSessionId, newProviderSessionId, newJsonlPath, forkName);
+    }
+
+    return { sessionId: newSessionId, sourceSessionId: sessionId };
+  },
 };

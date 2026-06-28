@@ -437,6 +437,16 @@ export function useProjectsState({
    * (for example websocket/project refresh updates) that could cause accidental resets.
    */
   const [newSessionTrigger, setNewSessionTrigger] = useState(0);
+  const [pendingChatMessage, setPendingChatMessage] = useState<string | null>(null);
+
+  const implementTaskInChat = useCallback((message: string) => {
+    setPendingChatMessage(message);
+    setActiveTab('chat');
+  }, []);
+
+  const clearPendingChatMessage = useCallback(() => {
+    setPendingChatMessage(null);
+  }, []);
 
   const loadingProgressTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   /**
@@ -1041,6 +1051,9 @@ export function useProjectsState({
     settingsInitialTab,
     externalMessageUpdate,
     newSessionTrigger,
+    pendingChatMessage,
+    implementTaskInChat,
+    clearPendingChatMessage,
     setActiveTab,
     setSidePanel,
     setSidebarOpen,

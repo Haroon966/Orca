@@ -8,11 +8,12 @@ import TaskDetailModal from './TaskDetailModal';
 
 type TaskMasterPanelProps = {
   isVisible: boolean;
+  onImplementTaskInChat?: (task: import('../types').TaskMasterTask) => void;
 };
 
 const PRD_SAVE_MESSAGE = 'PRD saved successfully!';
 
-export default function TaskMasterPanel({ isVisible }: TaskMasterPanelProps) {
+export default function TaskMasterPanel({ isVisible, onImplementTaskInChat }: TaskMasterPanelProps) {
   const { tasks, currentProject, refreshTasks } = useTaskMaster();
 
   const [selectedTask, setSelectedTask] = useState<TaskMasterTask | null>(null);
@@ -95,6 +96,7 @@ export default function TaskMasterPanel({ isVisible }: TaskMasterPanelProps) {
             onRefreshPRDs={(showNotification = false) => {
               void refreshPrdData(showNotification);
             }}
+            onImplementTaskInChat={onImplementTaskInChat ?? null}
           />
         </div>
       </div>

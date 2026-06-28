@@ -39,7 +39,7 @@ type BrowserUseSession = {
   updatedAt: string;
   lastAction: string | null;
   message: string | null;
-  createdBy: 'agent';
+  createdBy: 'agent' | 'user';
   profileName: string | null;
   viewport: {
     width: number;
@@ -133,6 +133,7 @@ export default function BrowserUsePanel({ isVisible, onShowSettings }: BrowserUs
   const [isInstalling, setIsInstalling] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [openUrl, setOpenUrl] = useState('https://');
 
   const selectedSession = useMemo(
     () => sessions.find((session) => session.id === selectedSessionId) || sessions[0] || null,
@@ -222,6 +223,15 @@ export default function BrowserUsePanel({ isVisible, onShowSettings }: BrowserUs
     }
   });
 
+  const openUserSession = () => runAction(async () => {
+    const response = await authenticatedFetch('/api/browser-use/sessions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url: openUrl }),
+    });
+    await readJson(response);
+  });
+
   const renderSessionItem = (session: BrowserUseSession) => {
     const isSelected = selectedSession?.id === session.id;
     return (
@@ -294,6 +304,27 @@ export default function BrowserUsePanel({ isVisible, onShowSettings }: BrowserUs
               )}
               {isInstalling || status?.installInProgress ? 'Installing...' : 'Install Runtime'}
             </Button>
+          </div>
+        )}
+
+        {status?.enabled && status.available && (
+          <div className="mt-4 rounded-md border border-border bg-muted/30 p-3">
+            <div className="text-sm font-medium text-foreground">Open a URL manually</div>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Start a browser session yourself for QA or debugging.
+            </p>
+            <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+              <input
+                type="url"
+                value={openUrl}
+                onChange={(event) => setOpenUrl(event.target.value)}
+                className="min-w-0 flex-1 rounded-md border border-border bg-background px-3 py-2 text-sm"
+                placeholder="https://example.com"
+              />
+              <Button type="button" size="sm" onClick={openUserSession} disabled={isBusy || !openUrl.trim()}>
+                Open URL
+              </Button>
+            </div>
           </div>
         )}
 

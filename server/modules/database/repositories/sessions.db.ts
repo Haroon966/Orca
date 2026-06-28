@@ -426,4 +426,21 @@ export const sessionsDb = {
     const db = getConnection();
     return db.prepare('DELETE FROM sessions WHERE session_id = ?').run(sessionId).changes > 0;
   },
+
+  updateSessionTranscript(
+    sessionId: string,
+    providerSessionId: string,
+    jsonlPath: string,
+    customName?: string | null,
+  ): void {
+    const db = getConnection();
+    db.prepare(
+      `UPDATE sessions SET
+         provider_session_id = ?,
+         jsonl_path = ?,
+         custom_name = COALESCE(?, custom_name),
+         updated_at = CURRENT_TIMESTAMP
+       WHERE session_id = ?`,
+    ).run(providerSessionId, jsonlPath, customName ?? null, sessionId);
+  },
 };

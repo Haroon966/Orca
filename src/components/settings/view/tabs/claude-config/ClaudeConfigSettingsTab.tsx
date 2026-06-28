@@ -58,6 +58,9 @@ export default function ClaudeConfigSettingsTab({
     readAgentFile,
     readConfigFile,
     readRuleFile,
+    saveAgentFile,
+    saveRuleFile,
+    saveConfigFile,
   } = useClaudeConfig(projectPath);
 
   const isDirty = Object.values(dirtySections).some(Boolean);
@@ -210,11 +213,13 @@ export default function ClaudeConfigSettingsTab({
         <ConfigBrowserSection
           title={t('claudeConfig.skillsTitle', { defaultValue: 'Skills' })}
           description={t('claudeConfig.skillsDescription', {
-            defaultValue: 'Read-only view of Claude skills from user, project, and plugin sources.',
+            defaultValue: 'View and edit Claude skills from user, project, and plugin sources.',
           })}
           files={skills}
           emptyMessage={t('claudeConfig.skillsEmpty', { defaultValue: 'No skills found.' })}
           onRead={readConfigFile}
+          onSave={saveConfigFile}
+          onDirtyChange={(dirty) => reportSectionDirty('skills', dirty)}
         />
       )}
 
@@ -222,11 +227,13 @@ export default function ClaudeConfigSettingsTab({
         <ConfigBrowserSection
           title={t('claudeConfig.agentsTitle', { defaultValue: 'Agents' })}
           description={t('claudeConfig.agentsDescription', {
-            defaultValue: 'Preview subagent definitions from ~/.claude/agents and project .claude/agents.',
+            defaultValue: 'Edit subagent definitions from ~/.claude/agents and project .claude/agents.',
           })}
           files={agents}
           emptyMessage={t('claudeConfig.agentsEmpty', { defaultValue: 'No agent files found.' })}
           onRead={readAgentFile}
+          onSave={saveAgentFile}
+          onDirtyChange={(dirty) => reportSectionDirty('agents', dirty)}
         />
       )}
 
@@ -234,11 +241,13 @@ export default function ClaudeConfigSettingsTab({
         <ConfigBrowserSection
           title={t('claudeConfig.rulesTitle', { defaultValue: 'Rules' })}
           description={t('claudeConfig.rulesDescription', {
-            defaultValue: 'Preview path-scoped rules from .claude/rules/*.md.',
+            defaultValue: 'Edit path-scoped rules from .claude/rules/*.md.',
           })}
           files={rules}
           emptyMessage={t('claudeConfig.rulesEmpty', { defaultValue: 'No rules found for this project.' })}
           onRead={readRuleFile}
+          onSave={saveRuleFile}
+          onDirtyChange={(dirty) => reportSectionDirty('rules', dirty)}
         />
       )}
     </div>

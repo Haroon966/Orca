@@ -2,9 +2,10 @@ import { useState } from 'react';
 import { markdown } from '@codemirror/lang-markdown';
 import { EditorView } from '@codemirror/view';
 import CodeMirror from '@uiw/react-codemirror';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Save } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
+import { Button } from '../../../../../shared/view/ui';
 import { useClaudeConfigEditorTheme } from '../../../hooks/useClaudeConfigEditorTheme';
 import SettingsCard from '../../SettingsCard';
 import SettingsSection from '../../SettingsSection';
@@ -16,7 +17,9 @@ type ConfigBrowserSectionProps = {
   files: ConfigFileEntry[];
   emptyMessage: string;
   onRead: (filePath: string) => Promise<{ content: string; path: string }>;
+  onSave?: (filePath: string, content: string) => Promise<void>;
   readOnly?: boolean;
+  onDirtyChange?: (dirty: boolean) => void;
 };
 
 export default function ConfigBrowserSection({
@@ -25,27 +28,62 @@ export default function ConfigBrowserSection({
   files,
   emptyMessage,
   onRead,
-  readOnly = true,
+  onSave,
+  readOnly = false,
+  onDirtyChange,
 }: ConfigBrowserSectionProps) {
   const { t } = useTranslation('settings');
   const editorTheme = useClaudeConfigEditorTheme();
   const [selectedPath, setSelectedPath] = useState<string | null>(null);
   const [content, setContent] = useState('');
+  const [savedContent, setSavedContent] = useState('');
   const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
+
+  const isDirty = !readOnly && selectedPath !== null && content !== savedContent;
+
+  const reportDirty = (dirty: boolean) => {
+    onDirtyChange?.(dirty);
+  };
 
   const handleSelect = async (filePath: string) => {
     setSelectedPath(filePath);
     setLoading(true);
     setLoadError(null);
+    setSaveError(null);
     try {
       const data = await onRead(filePath);
       setContent(data.content);
+      setSavedContent(data.content);
+      reportDirty(false);
     } catch {
       setContent('');
+      setSavedContent('');
       setLoadError(t('claudeConfig.readFailed', { defaultValue: 'Failed to read file' }));
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleContentChange = (value: string) => {
+    setContent(value);
+    reportDirty(value !== savedContent);
+  };
+
+  const handleSave = async () => {
+    if (!selectedPath || !onSave || readOnly) return;
+    setSaving(true);
+    setSaveError(null);
+    try {
+      await onSave(selectedPath, content);
+      setSavedContent(content);
+      reportDirty(false);
+    } catch {
+      setSaveError(t('claudeConfig.saveFailed', { defaultValue: 'Failed to save file' }));
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -54,8 +92,20 @@ export default function ConfigBrowserSection({
       <SettingsCard className="p-4">
         <div className="mb-3 flex items-center justify-between gap-2">
           <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
-            {t('claudeConfig.readOnly', { defaultValue: 'Read-only' })}
+            {readOnly
+              ? t('claudeConfig.readOnly', { defaultValue: 'Read-only' })
+              : t('claudeConfig.editable', { defaultValue: 'Editable' })}
           </span>
+          {!readOnly && onSave && selectedPath && (
+            <Button
+              size="sm"
+              onClick={() => void handleSave()}
+              disabled={!isDirty || saving || loading}
+            >
+              {saving ? <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" /> : <Save className="mr-2 h-3.5 w-3.5" />}
+              {t('claudeConfig.save', { defaultValue: 'Save' })}
+            </Button>
+          )}
         </div>
         <div className="grid gap-4 md:grid-cols-[220px_1fr]">
           <div className="max-h-48 overflow-y-auto rounded-lg border border-border">
@@ -90,6 +140,9 @@ export default function ConfigBrowserSection({
                 {loadError && (
                   <p className="mb-2 text-sm text-red-600 dark:text-red-400">{loadError}</p>
                 )}
+                {saveError && (
+                  <p className="mb-2 text-sm text-red-600 dark:text-red-400">{saveError}</p>
+                )}
                 <div className="overflow-hidden rounded-lg border border-border">
                   {loading ? (
                     <div className="flex items-center gap-2 p-4 text-sm text-muted-foreground">
@@ -99,7 +152,7 @@ export default function ConfigBrowserSection({
                   ) : (
                     <CodeMirror
                       value={content}
-                      onChange={readOnly ? undefined : setContent}
+                      onChange={readOnly ? undefined : handleContentChange}
                       extensions={[markdown(), EditorView.lineWrapping]}
                       theme={editorTheme}
                       height="200px"

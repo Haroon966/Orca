@@ -1,0 +1,72 @@
+{
+  "steps": {
+    "git": "Git Configuration",
+    "agents": "Connect Claude",
+    "projects": "Discover Projects",
+    "mcp": "MCP Setup",
+    "features": "Power Features",
+    "health": "Health Check"
+  },
+  "required": "Required",
+  "optional": "Optional",
+  "previous": "Previous",
+  "next": "Next",
+  "skip": "Skip",
+  "finish": "Complete Setup",
+  "saving": "Saving...",
+  "completing": "Completing...",
+  "projects": {
+    "title": "Discover your projects",
+    "description": "Orca found these Claude Code workspaces. You can open any of them after setup.",
+    "empty": "No existing projects found yet. Create one from the sidebar after setup.",
+    "loading": "Scanning for projects...",
+    "sessionCount": "{{count}} sessions"
+  },
+  "mcp": {
+    "title": "Model Context Protocol (MCP)",
+    "description": "MCP servers extend Claude with tools — databases, APIs, browsers, and more.",
+    "hint": "Add MCP servers anytime in Settings → Agents → MCP.",
+    "skipHint": "You can skip this and configure MCP later."
+  },
+  "features": {
+    "title": "Power features",
+    "description": "Orca includes tools beyond chat. Here is a quick overview.",
+    "commandPalette": {
+      "title": "Command palette",
+      "description": "Press ⌘K (Ctrl+K) to jump to sessions, files, git actions, and settings."
+    },
+    "gitPanel": {
+      "title": "Git panel",
+      "description": "Review diffs, commit with AI-generated messages, and manage branches."
+    },
+    "taskMaster": {
+      "title": "Task board",
+      "description": "Enable TaskMaster in Settings → Tasks for kanban-style project planning."
+    },
+    "browser": {
+      "title": "Browser automation",
+      "description": "Enable Browser in Settings → Browser so agents can inspect web pages."
+    },
+    "claudeConfig": {
+      "title": "Claude Config",
+      "description": "Edit CLAUDE.md, hooks, memory, skills, and agents in Settings → Claude Config."
+    }
+  },
+  "health": {
+    "title": "System health",
+    "description": "Quick check that Orca is ready to use.",
+    "loading": "Running health checks...",
+    "claudeCli": "Claude CLI",
+    "dataDir": "Data directory",
+    "taskMaster": "TaskMaster CLI",
+    "browser": "Browser runtime",
+    "serverBind": "Server bind address",
+    "ready": "Ready",
+    "notFound": "Not found",
+    "notInstalled": "Not installed",
+    "disabled": "Disabled",
+    "setupRequired": "Setup required",
+    "warning": "Warning",
+    "legacyPaths": "Legacy data paths detected — Orca migrates these automatically on first boot."
+  }
+}

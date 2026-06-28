@@ -6,6 +6,7 @@ import {
   ChevronUp,
   Circle,
   Clock,
+  MessageSquarePlus,
   Minus,
   Pause,
   X,
@@ -17,6 +18,7 @@ import type { TaskMasterTask } from '../types';
 type TaskCardProps = {
   task: TaskMasterTask;
   onClick?: (() => void) | null;
+  onImplementInChat?: (() => void) | null;
   showParent?: boolean;
   className?: string;
 };
@@ -131,7 +133,7 @@ function getSubtaskProgress(task: TaskMasterTask): { completed: number; total: n
   return { completed, total, percentage };
 }
 
-function TaskCard({ task, onClick = null, showParent = false, className = '' }: TaskCardProps) {
+function TaskCard({ task, onClick = null, onImplementInChat = null, showParent = false, className = '' }: TaskCardProps) {
   const statusStyle = getStatusStyle(task.status);
   const progress = getSubtaskProgress(task);
 
@@ -186,6 +188,20 @@ function TaskCard({ task, onClick = null, showParent = false, className = '' }: 
           </div>
         </Tooltip>
       </div>
+
+      {onImplementInChat && task.status !== 'done' && task.status !== 'cancelled' && (
+        <button
+          type="button"
+          onClick={(event) => {
+            event.stopPropagation();
+            onImplementInChat();
+          }}
+          className="flex w-full items-center justify-center gap-1.5 rounded-md border border-blue-200 bg-blue-50 px-2 py-1.5 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-100 dark:border-blue-800 dark:bg-blue-950/40 dark:text-blue-300 dark:hover:bg-blue-900/40"
+        >
+          <MessageSquarePlus className="h-3.5 w-3.5" />
+          Implement in chat
+        </button>
+      )}
 
       {progress.total > 0 && (
         <div className="ml-3">

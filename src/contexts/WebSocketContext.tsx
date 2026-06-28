@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { AUTH_TOKEN_KEY, DISABLE_AUTH } from '../constants/auth';
 
 /**
  * One frame received from the chat websocket. The server guarantees every
@@ -51,7 +52,20 @@ export const useWebSocket = () => {
 
 const buildWebSocketUrl = () => {
   const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-  return `${protocol}//${window.location.host}/ws`;
+  let url = `${protocol}//${window.location.host}/ws`;
+
+  if (!DISABLE_AUTH) {
+    try {
+      const token = localStorage.getItem(AUTH_TOKEN_KEY);
+      if (token) {
+        url += `?token=${encodeURIComponent(token)}`;
+      }
+    } catch {
+      // Ignore storage errors
+    }
+  }
+
+  return url;
 };
 
 const useWebSocketProviderState = (): WebSocketContextType => {

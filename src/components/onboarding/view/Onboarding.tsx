@@ -1,21 +1,29 @@
 import { Check, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { authenticatedFetch } from '../../../utils/api';
 import { useProviderAuthStatus } from '../../provider-auth/hooks/useProviderAuthStatus';
 import ProviderLoginModal from '../../provider-auth/view/ProviderLoginModal';
 import AgentConnectionsStep from './subcomponents/AgentConnectionsStep';
 import GitConfigurationStep from './subcomponents/GitConfigurationStep';
 import OnboardingStepProgress from './subcomponents/OnboardingStepProgress';
+import HealthCheckStep from './steps/HealthCheckStep';
+import McpIntroStep from './steps/McpIntroStep';
+import PowerFeaturesStep from './steps/PowerFeaturesStep';
+import ProjectDiscoveryStep from './steps/ProjectDiscoveryStep';
 import {
   gitEmailPattern,
   readErrorMessageFromResponse,
 } from './utils';
+
+const LAST_STEP = 5;
 
 type OnboardingProps = {
   onComplete?: () => void | Promise<void>;
 };
 
 export default function Onboarding({ onComplete }: OnboardingProps) {
+  const { t } = useTranslation('onboarding');
   const [currentStep, setCurrentStep] = useState(0);
   const [gitName, setGitName] = useState('');
   const [gitEmail, setGitEmail] = useState('');
@@ -77,7 +85,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
     setErrorMessage('');
 
     if (currentStep !== 0) {
-      setCurrentStep((previous) => previous + 1);
+      setCurrentStep((previous) => Math.min(previous + 1, LAST_STEP));
       return;
     }
 
@@ -114,7 +122,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
 
   const handlePreviousStep = () => {
     setErrorMessage('');
-    setCurrentStep((previous) => previous - 1);
+    setCurrentStep((previous) => Math.max(previous - 1, 0));
   };
 
   const handleFinish = async () => {
@@ -140,6 +148,38 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
     ? Boolean(gitName.trim() && gitEmail.trim() && gitEmailPattern.test(gitEmail))
     : true;
 
+  const renderStep = () => {
+    switch (currentStep) {
+      case 0:
+        return (
+          <GitConfigurationStep
+            gitName={gitName}
+            gitEmail={gitEmail}
+            isSubmitting={isSubmitting}
+            onGitNameChange={setGitName}
+            onGitEmailChange={setGitEmail}
+          />
+        );
+      case 1:
+        return (
+          <AgentConnectionsStep
+            claudeStatus={providerAuthStatus.claude}
+            onOpenClaudeLogin={handleClaudeLoginOpen}
+          />
+        );
+      case 2:
+        return <ProjectDiscoveryStep />;
+      case 3:
+        return <McpIntroStep />;
+      case 4:
+        return <PowerFeaturesStep />;
+      case 5:
+        return <HealthCheckStep />;
+      default:
+        return null;
+    }
+  };
+
   return (
     <>
       <div className="flex min-h-screen items-center justify-center bg-background p-4">
@@ -147,20 +187,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
           <OnboardingStepProgress currentStep={currentStep} />
 
           <div className="rounded-lg border border-border bg-card p-8 shadow-lg">
-            {currentStep === 0 ? (
-              <GitConfigurationStep
-                gitName={gitName}
-                gitEmail={gitEmail}
-                isSubmitting={isSubmitting}
-                onGitNameChange={setGitName}
-                onGitEmailChange={setGitEmail}
-              />
-            ) : (
-              <AgentConnectionsStep
-                claudeStatus={providerAuthStatus.claude}
-                onOpenClaudeLogin={handleClaudeLoginOpen}
-              />
-            )}
+            {renderStep()}
 
             {errorMessage && (
               <div className="mt-6 rounded-lg border border-red-300 bg-red-100 p-4 dark:border-red-800 dark:bg-red-900/20">
@@ -175,11 +202,11 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                 className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-muted-foreground transition-colors duration-200 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <ChevronLeft className="h-4 w-4" />
-                Previous
+                {t('previous')}
               </button>
 
               <div className="flex items-center gap-3">
-                {currentStep < 1 ? (
+                {currentStep < LAST_STEP ? (
                   <button
                     onClick={handleNextStep}
                     disabled={!isCurrentStepValid || isSubmitting}
@@ -188,11 +215,11 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                     {isSubmitting ? (
                       <>
                         <Loader2 className="h-4 w-4 animate-spin" />
-                        Saving...
+                        {t('saving')}
                       </>
                     ) : (
                       <>
-                        Next
+                        {currentStep === 0 ? t('next') : t('skip')}
                         <ChevronRight className="h-4 w-4" />
                       </>
                     )}
@@ -206,12 +233,12 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                     {isSubmitting ? (
                       <>
                         <Loader2 className="h-4 w-4 animate-spin" />
-                        Completing...
+                        {t('completing')}
                       </>
                     ) : (
                       <>
                         <Check className="h-4 w-4" />
-                        Complete Setup
+                        {t('finish')}
                       </>
                     )}
                   </button>

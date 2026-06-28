@@ -23,7 +23,7 @@ type BrowserUseSessionStatus = 'ready' | 'stopped' | 'unavailable';
 type BrowserUseSession = {
   id: string;
   ownerId: string;
-  createdBy: 'agent';
+  createdBy: 'agent' | 'user';
   runtime: BrowserUseRuntime;
   status: BrowserUseSessionStatus;
   url: string | null;
@@ -78,6 +78,7 @@ const DEFAULT_SETTINGS: BrowserUseSettings = {
   enabled: false,
 };
 const AGENT_OWNER_ID = 'agent';
+const USER_OWNER_ID = 'user';
 const PROFILE_ROOT = path.join(os.homedir(), '.orca', 'browser-use', 'profiles');
 const MCP_SERVER_NAME = 'orca-browser';
 const LEGACY_MCP_SERVER_NAMES = ['orca-browser-use'];
@@ -494,8 +495,26 @@ export const browserUseService = {
   async listSessions() {
     await expireStaleSessions();
     return [...sessions.values()]
-      .filter((session) => session.ownerId === AGENT_OWNER_ID)
+      .filter((session) => session.ownerId === AGENT_OWNER_ID || session.ownerId === USER_OWNER_ID)
       .map(publicSession);
+  },
+
+  async createUserSession(rawUrl: string) {
+    const settings = readSettings();
+    if (!settings.enabled) {
+      throw new Error('Browser is disabled. Enable it in Settings → Browser.');
+    }
+
+    const url = normalizeUrl(rawUrl);
+    const agentSession = await this.createAgentSession();
+    const navigated = await this.agentNavigate(agentSession.id, url);
+    const session = sessions.get(agentSession.id);
+    if (session) {
+      session.ownerId = USER_OWNER_ID;
+      session.createdBy = 'user';
+      session.lastAction = `open:${url}`;
+    }
+    return navigated;
   },
 
   async createAgentSession(options?: { profileName?: string | null }) {
@@ -788,7 +807,7 @@ export const browserUseService = {
 
   async stopSession(sessionId: string) {
     const session = sessions.get(sessionId);
-    if (!session || session.ownerId !== AGENT_OWNER_ID) {
+    if (!session || (session.ownerId !== AGENT_OWNER_ID && session.ownerId !== USER_OWNER_ID)) {
       return { stopped: false };
     }
 
@@ -803,7 +822,7 @@ export const browserUseService = {
 
   async deleteSession(sessionId: string) {
     const session = sessions.get(sessionId);
-    if (!session || session.ownerId !== AGENT_OWNER_ID) {
+    if (!session || (session.ownerId !== AGENT_OWNER_ID && session.ownerId !== USER_OWNER_ID)) {
       return { deleted: false };
     }
 

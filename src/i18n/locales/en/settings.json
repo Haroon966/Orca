@@ -632,5 +632,23 @@
     "installAriaLabel": "Plugin git repository URL",
     "tab": "tab",
     "runningStatus": "running"
+  },
+  "skillsMarketplace": {
+    "tabs": {
+      "installed": "Installed",
+      "marketplace": "Marketplace"
+    },
+    "title": "Skills Marketplace",
+    "description": "Browse curated agent skills and install them to your global skills directory.",
+    "searchPlaceholder": "Search skills…",
+    "categoryFilter": "Filter by category",
+    "allCategories": "All categories",
+    "loading": "Loading marketplace…",
+    "empty": "No skills match your filters.",
+    "install": "Install",
+    "installing": "Installing…",
+    "installed": "Installed",
+    "installSuccess": "{{name}} installed successfully.",
+    "securityWarning": "Review the skill source repository before installing. Skills run with the same access as your coding agent."
   }
 }

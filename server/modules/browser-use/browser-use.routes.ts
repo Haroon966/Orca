@@ -69,6 +69,22 @@ router.get('/sessions', async (_req, res) => {
   }
 });
 
+router.post('/sessions', async (req, res) => {
+  try {
+    const url = typeof req.body?.url === 'string' ? req.body.url.trim() : '';
+    if (!url) {
+      return res.status(400).json({ success: false, error: 'url is required' });
+    }
+    const session = await browserUseService.createUserSession(url);
+    res.json({ success: true, data: { session } });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to create browser session.',
+    });
+  }
+});
+
 router.post('/sessions/:sessionId/stop', async (req, res) => {
   try {
     const result = await browserUseService.stopSession(readParam(req.params.sessionId));

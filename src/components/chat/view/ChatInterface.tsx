@@ -37,6 +37,8 @@ function ChatInterface({
   sendByCtrlEnter,
   externalMessageUpdate,
   newSessionTrigger,
+  pendingChatMessage,
+  onPendingChatMessageApplied,
   onShowAllTasks,
 }: ChatInterfaceProps) {
   const { tasksEnabled, isTaskMasterInstalled } = useTasksSettings();
@@ -216,6 +218,8 @@ function ChatInterface({
     addMessage,
     setIsUserScrolledUp,
     setPendingPermissionRequests,
+    pendingChatMessage,
+    onPendingChatMessageApplied,
   });
 
   // On WebSocket reconnect, re-fetch the current session's messages from the

@@ -5,6 +5,9 @@ import { IS_PLATFORM } from '../constants/config.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || appConfigDb.getOrCreateJwtSecret();
 
+/** When true (default), skip login and attach the local user. Set DISABLE_AUTH=false for LAN deployments. */
+export const DISABLE_AUTH = process.env.DISABLE_AUTH !== 'false';
+
 const validateApiKey = (req, res, next) => {
   if (!process.env.API_KEY) {
     return next();
@@ -30,17 +33,38 @@ const ensureLocalUser = () => {
   return userDb.getUserById(userId);
 };
 
-/** ClaudeUI: no app login — attach the local database user for prefs/onboarding routes. */
 const authenticateToken = async (req, res, next) => {
   try {
-    const user = ensureLocalUser();
-    req.user = user;
-    next();
+    if (DISABLE_AUTH) {
+      const user = ensureLocalUser();
+      req.user = user;
+      next();
+      return;
+    }
+
+    const authHeader = req.headers.authorization;
+    const token = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
+
+    if (!token) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+
+    try {
+      const decoded = jwt.verify(token, JWT_SECRET);
+      const user = userDb.getUserById(decoded.userId);
+      if (!user) {
+        return res.status(401).json({ error: 'Invalid token' });
+      }
+      req.user = user;
+      next();
+    } catch {
+      return res.status(401).json({ error: 'Invalid or expired token' });
+    }
   } catch (error) {
-    console.error('Local user resolution error:', error);
+    console.error('Authentication error:', error);
     const message = IS_PLATFORM
       ? 'Platform mode: No user found in database'
-      : 'Failed to resolve local user';
+      : 'Failed to resolve user';
     res.status(500).json({ error: message });
   }
 };
@@ -56,15 +80,28 @@ const generateToken = (user) => {
   );
 };
 
-const authenticateWebSocket = () => {
+const authenticateWebSocket = (token) => {
   try {
-    const user = ensureLocalUser();
-    if (user) {
-      return { id: user.id, userId: user.id, username: user.username };
+    if (DISABLE_AUTH) {
+      const user = ensureLocalUser();
+      if (user) {
+        return { id: user.id, userId: user.id, username: user.username };
+      }
+      return null;
     }
-    return null;
+
+    if (!token) {
+      return null;
+    }
+
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const user = userDb.getUserById(decoded.userId);
+    if (!user) {
+      return null;
+    }
+    return { id: user.id, userId: user.id, username: user.username };
   } catch (error) {
-    console.error('WebSocket local user error:', error);
+    console.error('WebSocket auth error:', error);
     return null;
   }
 };

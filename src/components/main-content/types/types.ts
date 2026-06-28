@@ -59,6 +59,9 @@ export type MainContentProps = {
   onShowSettings: (tab?: SettingsMainTab) => void;
   externalMessageUpdate: number;
   newSessionTrigger: number;
+  pendingChatMessage?: string | null;
+  onPendingChatMessageApplied?: () => void;
+  onImplementTaskInChat?: (message: string) => void;
 };
 
 export type MainContentHeaderProps = {

@@ -69,6 +69,9 @@ function AppContentInner() {
     isLoadingProjects,
     externalMessageUpdate,
     newSessionTrigger,
+    pendingChatMessage,
+    implementTaskInChat,
+    clearPendingChatMessage,
     setActiveTab,
     setSidePanel,
     setSidebarOpen,
@@ -253,6 +256,9 @@ function AppContentInner() {
           onShowSettings={openSettings}
           externalMessageUpdate={externalMessageUpdate}
           newSessionTrigger={newSessionTrigger}
+          pendingChatMessage={pendingChatMessage}
+          onPendingChatMessageApplied={clearPendingChatMessage}
+          onImplementTaskInChat={implementTaskInChat}
         />
       </div>
 

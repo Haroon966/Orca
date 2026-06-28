@@ -1,9 +1,22 @@
-// Utility function for API calls (ClaudeUI has no app-level JWT auth)
+import { AUTH_TOKEN_KEY, DISABLE_AUTH } from '../constants/auth';
+
+// Utility function for API calls
 export const authenticatedFetch = (url, options = {}) => {
   const defaultHeaders = {};
 
   if (!(options.body instanceof FormData)) {
     defaultHeaders['Content-Type'] = 'application/json';
+  }
+
+  if (!DISABLE_AUTH) {
+    try {
+      const token = localStorage.getItem(AUTH_TOKEN_KEY);
+      if (token) {
+        defaultHeaders.Authorization = `Bearer ${token}`;
+      }
+    } catch {
+      // Ignore storage errors
+    }
   }
 
   return fetch(url, {
@@ -76,6 +89,12 @@ export const api = {
     authenticatedFetch(`/api/providers/sessions/${sessionId}`, {
       method: 'PUT',
       body: JSON.stringify({ summary }),
+    }),
+  exportSession: (sessionId, format = 'markdown') =>
+    authenticatedFetch(`/api/providers/sessions/${encodeURIComponent(sessionId)}/export?format=${format}`),
+  forkSession: (sessionId) =>
+    authenticatedFetch(`/api/providers/sessions/${encodeURIComponent(sessionId)}/fork`, {
+      method: 'POST',
     }),
   // `hardDelete` => server `?force=true` (remove DB row + Claude *.jsonl + sessions rows for path).
   deleteProject: (projectId, hardDelete = false) => {
@@ -196,6 +215,24 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ path: folderPath }),
     }),
+
+  // Auth endpoints
+  auth: {
+    status: () => fetch('/api/auth/status'),
+    user: () => authenticatedFetch('/api/auth/user'),
+    login: (username, password) =>
+      fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      }),
+    register: (username, password) =>
+      fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      }),
+  },
 
   // User endpoints
   user: {

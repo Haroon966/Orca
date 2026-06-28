@@ -920,6 +920,47 @@ export function useSidebarController({
     [onRefresh, t],
   );
 
+  const exportSessionTranscript = useCallback(async (sessionId: string) => {
+    try {
+      const response = await api.exportSession(sessionId, 'markdown');
+      if (!response.ok) {
+        showToast(t('messages.exportSessionFailed', 'Failed to export session'), 'error');
+        return;
+      }
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = `session-${sessionId.slice(0, 8)}.md`;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('[Sidebar] Export session failed:', error);
+      showToast(t('messages.exportSessionFailed', 'Failed to export session'), 'error');
+    }
+  }, [showToast, t]);
+
+  const forkSessionTranscript = useCallback(async (sessionId: string) => {
+    try {
+      const response = await api.forkSession(sessionId);
+      if (!response.ok) {
+        showToast(t('messages.forkSessionFailed', 'Failed to fork session'), 'error');
+        return;
+      }
+      const payload = await response.json();
+      const newSessionId = payload?.data?.sessionId;
+      await onRefresh();
+      if (typeof newSessionId === 'string' && newSessionId) {
+        window.location.assign(`/session/${newSessionId}`);
+      }
+    } catch (error) {
+      console.error('[Sidebar] Fork session failed:', error);
+      showToast(t('messages.forkSessionFailed', 'Failed to fork session'), 'error');
+    }
+  }, [onRefresh, showToast, t]);
+
   const collapseSidebar = useCallback(() => {
     setSidebarVisible(false);
   }, [setSidebarVisible]);
@@ -971,6 +1012,8 @@ export function useSidebarController({
     restoreArchivedSession,
     refreshProjects,
     updateSessionSummary,
+    exportSessionTranscript,
+    forkSessionTranscript,
     collapseSidebar,
     expandSidebar,
     setShowNewProject,
