@@ -3,6 +3,12 @@
 All notable changes to Orca will be documented in this file.
 
 
+## [1.34.3](https://github.com/Haroon966/Orca/compare/v1.34.2...v1.34.3) (2026-06-28)
+
+### Bug Fixes
+
+* **desktop:** set Linux executableName for scoped npm package ([554086c](https://github.com/Haroon966/Orca/commit/554086c67e511e5086a8f36302dcb686ac0249e7))
+
 ## [1.34.2](https://github.com/Haroon966/Orca/compare/v1.34.1...v1.34.2) (2026-06-28)
 
 ### Bug Fixes
