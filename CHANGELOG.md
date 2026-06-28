@@ -3,6 +3,12 @@
 All notable changes to Orca will be documented in this file.
 
 
+## [1.34.4](https://github.com/Haroon966/Orca/compare/v1.34.3...v1.34.4) (2026-06-28)
+
+### Bug Fixes
+
+* **desktop:** remove invalid electron-builder linux options ([d13f810](https://github.com/Haroon966/Orca/commit/d13f810c0f836605dde7145e3dd7c5708102c291))
+
 ## [1.34.3](https://github.com/Haroon966/Orca/compare/v1.34.2...v1.34.3) (2026-06-28)
 
 ### Bug Fixes
