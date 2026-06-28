@@ -3,6 +3,13 @@
 All notable changes to Orca will be documented in this file.
 
 
+## [1.34.2](https://github.com/Haroon966/Orca/compare/v1.34.1...v1.34.2) (2026-06-28)
+
+### Bug Fixes
+
+* **ci:** unblock desktop release builds and document npm publish ([6add7b9](https://github.com/Haroon966/Orca/commit/6add7b9ea0f0fc77d6becba4507bbfd6b4094c84))
+* **i18n:** track zh-TW tasks locale for desktop CI builds ([a60507f](https://github.com/Haroon966/Orca/commit/a60507f43cdfd98ebb9a18463b7a8e6e057e646d))
+
 ## 1.34.1 (2026-06-28)
 
 ### New Features
