@@ -12,6 +12,7 @@ dist-server/
 dist-ssr/
 build/
 out/
+release/
 
 # Environment variables
 .env
